@@ -1,0 +1,6 @@
+Project 1 for Advanced Algorithms. To run and compile:
+
+1. Navigate to folder
+2. enter the command: Make
+
+This will delete, recompile and run (with Main.java as targets)
