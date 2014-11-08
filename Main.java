@@ -15,12 +15,11 @@ public class Main {
 		BigInteger a = BigInteger.valueOf(42);
 		BigInteger b = BigInteger.valueOf(12);
 		BigInteger c = BigInteger.valueOf(4);
-		BigInteger d = BigInteger.valueOf(60);
 
 		System.out.println("\ngcd(" + a + ", " + b + ") == " + gcd(a, b));
 		System.out.println("\npollardRho(" + c + ") == " + pollardRho(c));
 		System.out.println();
-		for(BigInteger x = BigInteger.valueOf(2); x.compareTo(d) <= 0; x = x.add(BigInteger.ONE)){
+		for(BigInteger x = BigInteger.valueOf(100000); x.compareTo(BigInteger.valueOf(100000)) <= 0; x = x.add(BigInteger.ONE)){
 			System.out.println("factors(" + x + ") == " + getPrimeFactors(x));	
 		}
 	}
