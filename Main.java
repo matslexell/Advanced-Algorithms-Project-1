@@ -7,7 +7,7 @@ public class Main {
 
 	public static void main(String[] args) throws FactorizationFailure{
 		Main m = new Main();
-		BigInteger a = BigInteger.valueOf(10);
+		BigInteger a = BigInteger.valueOf(42);
 		BigInteger b = BigInteger.valueOf(12);
 		BigInteger c = BigInteger.valueOf(1002);
 
@@ -15,6 +15,10 @@ public class Main {
 		System.out.println("pollardRho(" + c + ") = " + m.pollardRho(c));
 	}
 
+	/**
+	* Return the greatest common divisor of two numbers.
+	* For instance gcd(42, 12) == 6
+	*/
 	public BigInteger gcd(BigInteger a, BigInteger b){
 		BigInteger t;
 		while(b != BigInteger.ZERO){
@@ -25,6 +29,11 @@ public class Main {
 		return a;
 	}
 
+	/**
+	* Return a non-trivial factor of given number, or throw
+	* an exception if none can be found.
+	* For instance pollardRho(1002) == 3
+	*/
 	public BigInteger pollardRho(BigInteger n) throws FactorizationFailure{
 		BigInteger x = BigInteger.valueOf(2);
 		BigInteger y = BigInteger.valueOf(2);
