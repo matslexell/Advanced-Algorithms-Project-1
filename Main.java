@@ -17,8 +17,9 @@ public class Main {
 		BigInteger c = BigInteger.valueOf(4);
 		BigInteger d = BigInteger.valueOf(60);
 
-		System.out.println("gcd(" + a + ", " + b + ") == " + gcd(a, b));
-		System.out.println("pollardRho(" + c + ") == " + pollardRho(c));
+		System.out.println("\ngcd(" + a + ", " + b + ") == " + gcd(a, b));
+		System.out.println("\npollardRho(" + c + ") == " + pollardRho(c));
+		System.out.println();
 		for(BigInteger x = BigInteger.valueOf(2); x.compareTo(d) <= 0; x = x.add(BigInteger.ONE)){
 			System.out.println("factors(" + x + ") == " + getPrimeFactors(x));	
 		}
