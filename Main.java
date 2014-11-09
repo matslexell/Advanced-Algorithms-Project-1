@@ -14,14 +14,21 @@ public class Main {
 	public void testSomeMethods() throws FactorizationFailure{
 		BigInteger a = BigInteger.valueOf(42);
 		BigInteger b = BigInteger.valueOf(12);
-		BigInteger c = BigInteger.valueOf(4);
 
 		System.out.println("\ngcd(" + a + ", " + b + ") == " + gcd(a, b));
-		System.out.println("\npollardRho(" + c + ") == " + pollardRho(c));
+
 		System.out.println();
-		for(BigInteger x = BigInteger.valueOf(100000); x.compareTo(BigInteger.valueOf(100000)) <= 0; x = x.add(BigInteger.ONE)){
-			System.out.println("factors(" + x + ") == " + getPrimeFactors(x));	
+		for(BigInteger x = BigInteger.valueOf(2); x.compareTo(BigInteger.valueOf(10)) <= 0; x = x.add(BigInteger.ONE)){
+			try{
+				System.out.println("pollardRho(" + x + ") == " + pollardRho(x));	
+			}catch(FactorizationFailure e){
+				System.out.println(x + " is prime.");
+			}
 		}
+		
+		BigInteger x = BigInteger.valueOf(401 * 7 * 3 * 3);
+		//This is slow because it takes a long time to determine that 401 is actually prime.
+		System.out.println("\nfactors(" + x + ") == " + getPrimeFactors(x));	
 	}
 
 	/**
@@ -79,22 +86,24 @@ public class Main {
 	* For instance pollardRho(1002) == 3
 	*/
 	public BigInteger pollardRho(BigInteger n) throws FactorizationFailure{
-		for(BigInteger startValue = BigInteger.valueOf(2); startValue.compareTo(n) <= 0; startValue = startValue.add(BigInteger.ONE)){
-			// System.out.println("start: " + startValue);
-			try{
-				BigInteger answer = pollardRhoInner(n, startValue);
-				return answer;
-			}catch(FactorizationFailure e){ 
-				if(startValue.equals(n)){
-					throw e;
+		FactorizationFailure exception = null;
+		for(BigInteger addInG = BigInteger.ONE; addInG.compareTo(n) <= 0; addInG = addInG.add(BigInteger.ONE)){
+			// System.out.println("add: " + addInG);
+			for(BigInteger startValue = BigInteger.valueOf(2); startValue.compareTo(n.add(BigInteger.ONE)) <= 0; startValue = startValue.add(BigInteger.ONE)){
+				
+				try{
+					BigInteger answer = pollardRhoInner(n, startValue, addInG);
+					return answer;
+				}catch(FactorizationFailure e){ 
+					exception = e;
 				}
 			}
 		}
-		throw new IllegalStateException(); //Should not be reached.
+		throw exception;
 	}
 
 	//Try to return a non-trivial factor of given number.
-	private BigInteger pollardRhoInner(BigInteger n, BigInteger startValue) throws FactorizationFailure{
+	private BigInteger pollardRhoInner(BigInteger n, BigInteger startValue, BigInteger addInG) throws FactorizationFailure{
 		
 		//TODO My guess is that the chosen g() doesn't like the number 4.
 		if(n.intValue() == 4){
@@ -105,8 +114,8 @@ public class Main {
 		BigInteger y = startValue;
 		BigInteger d = BigInteger.ONE;
 		while(d.equals(BigInteger.ONE)){
-			x = g(x, n);
-			y = g(g(y, n), n);
+			x = g(x, n, addInG);
+			y = g(g(y, n, addInG), n, addInG);
 			d = gcd(x.subtract(y).abs(), n);
 			// System.out.println(x + ", " + y + ", " + d);
 		}
@@ -117,9 +126,9 @@ public class Main {
 	}
 
 	// Function used by pollardRho
-	public BigInteger g(BigInteger x, BigInteger n){
+	public BigInteger g(BigInteger x, BigInteger n, BigInteger toAdd){
 		// System.out.println("g(" + x + ", " + n + ") == " + x.pow(2).add(BigInteger.ONE).mod(n));
-		return x.pow(2).add(BigInteger.ONE).mod(n);
+		return x.pow(2).add(toAdd).mod(n);
 	}
 
 }
