@@ -1,5 +1,6 @@
 import java.math.*;
 import java.util.*;
+import java.util.function.*;
 
 public class Main {
 
@@ -90,9 +91,9 @@ public class Main {
 		for(BigInteger addInG = BigInteger.ONE; addInG.compareTo(n) <= 0; addInG = addInG.add(BigInteger.ONE)){
 			// System.out.println("add: " + addInG);
 			for(BigInteger startValue = BigInteger.valueOf(2); startValue.compareTo(n.add(BigInteger.ONE)) <= 0; startValue = startValue.add(BigInteger.ONE)){
-				
 				try{
-					BigInteger answer = pollardRhoInner(n, startValue, addInG);
+					G g = new G(n, addInG);
+					BigInteger answer = pollardRhoInner(n, startValue, x -> g.g(x));
 					return answer;
 				}catch(FactorizationFailure e){ 
 					exception = e;
@@ -103,7 +104,7 @@ public class Main {
 	}
 
 	//Try to return a non-trivial factor of given number.
-	private BigInteger pollardRhoInner(BigInteger n, BigInteger startValue, BigInteger addInG) throws FactorizationFailure{
+	private BigInteger pollardRhoInner(BigInteger n, BigInteger startValue, UnaryOperator<BigInteger> g) throws FactorizationFailure{
 		
 		//TODO My guess is that the chosen g() doesn't like the number 4.
 		if(n.intValue() == 4){
@@ -114,8 +115,8 @@ public class Main {
 		BigInteger y = startValue;
 		BigInteger d = BigInteger.ONE;
 		while(d.equals(BigInteger.ONE)){
-			x = g(x, n, addInG);
-			y = g(g(y, n, addInG), n, addInG);
+			x = g.apply(x);
+			y = g.apply(g.apply(y));
 			d = gcd(x.subtract(y).abs(), n);
 			// System.out.println(x + ", " + y + ", " + d);
 		}
@@ -125,10 +126,18 @@ public class Main {
 		return d;
 	}
 
-	// Function used by pollardRho
-	public BigInteger g(BigInteger x, BigInteger n, BigInteger toAdd){
-		// System.out.println("g(" + x + ", " + n + ") == " + x.pow(2).add(BigInteger.ONE).mod(n));
-		return x.pow(2).add(toAdd).mod(n);
+	private class G{
+		private BigInteger n;
+		private BigInteger toAdd;
+
+		G(BigInteger n, BigInteger toAdd){
+			this.n = n;
+			this.toAdd = toAdd;
+		}
+
+		BigInteger g(BigInteger x){
+			return x.pow(2).add(toAdd).mod(n);
+		}
 	}
 
 }
