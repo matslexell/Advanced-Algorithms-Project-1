@@ -29,20 +29,27 @@ public class Main {
 		
 		BigInteger x = BigInteger.valueOf(982451653).multiply(BigInteger.valueOf(7919 * 7 * 3 * 3));
 		System.out.println("\nfactors(" + x + ") == " + getPrimeFactors(x));
-		x = BigInteger.valueOf(982451653).multiply(BigInteger.valueOf(982451653)).multiply(BigInteger.valueOf(7919 * 7 * 3 * 3));
+		x = BigInteger.valueOf(982451632).pow(2);
 		System.out.println("\nfactors(" + x + ") == " + getPrimeFactors(x));	
 	}
 
 	public BigInteger getFactor(BigInteger n) throws FactorizationFailure{
+		
 		if(n.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) <= 0){
-			return BigInteger.valueOf(getFactor(n.longValue()));
+			naiveGetFactor(n);
 		}
 		return pollardRho(n);
 	}
 
-	public long getFactor(long n) throws FactorizationFailure{
-		for(long f = 2; f <= Math.sqrt(n); f++){
-			if(n % f == 0){
+	public BigInteger naiveGetFactor(BigInteger n) throws FactorizationFailure{
+		double log = Math.log(n.doubleValue());
+		BigInteger max = BigInteger.valueOf((long) Math.pow(Math.E, Math.ceil(log/2)));
+		if(max.compareTo(n) >= 0){
+			max = n.subtract(BigInteger.ONE);
+		}
+		// System.out.println("Small n: " + n);
+		for(BigInteger f = BigInteger.valueOf(2); f.compareTo(max) <= 0; f = f.add(BigInteger.ONE)){
+			if(n.divideAndRemainder(f)[1].equals(BigInteger.ZERO)){
 				return f;
 			}
 		}
@@ -77,10 +84,12 @@ public class Main {
 		while(! factors.isEmpty()){
 			factor = factors.remove(0);
 			try{
+				// System.out.println("getFactor(" + factor + ")");
 				smallerFactor = getFactor(factor);
 				factors.add(smallerFactor);
 				factors.add(factor.divide(smallerFactor));
 			}catch(FactorizationFailure e){
+				// System.out.println("it's prime");
 				increment(primeFactors, factor);
 			}
 		}
