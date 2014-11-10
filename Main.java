@@ -27,9 +27,26 @@ public class Main {
 			}
 		}
 		
-		BigInteger x = BigInteger.valueOf(401 * 7 * 3 * 3);
-		//This is slow because it takes a long time to determine that 401 is actually prime.
+		BigInteger x = BigInteger.valueOf(982451653).multiply(BigInteger.valueOf(7919 * 7 * 3 * 3));
+		System.out.println("\nfactors(" + x + ") == " + getPrimeFactors(x));
+		x = BigInteger.valueOf(982451653).multiply(BigInteger.valueOf(982451653)).multiply(BigInteger.valueOf(7919 * 7 * 3 * 3));
 		System.out.println("\nfactors(" + x + ") == " + getPrimeFactors(x));	
+	}
+
+	public BigInteger getFactor(BigInteger n) throws FactorizationFailure{
+		if(n.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) <= 0){
+			return BigInteger.valueOf(getFactor(n.longValue()));
+		}
+		return pollardRho(n);
+	}
+
+	public long getFactor(long n) throws FactorizationFailure{
+		for(long f = 2; f <= Math.sqrt(n); f++){
+			if(n % f == 0){
+				return f;
+			}
+		}
+		throw new FactorizationFailure(n + " is prime.");
 	}
 
 	/**
@@ -60,7 +77,7 @@ public class Main {
 		while(! factors.isEmpty()){
 			factor = factors.remove(0);
 			try{
-				smallerFactor = pollardRho(factor);
+				smallerFactor = getFactor(factor);
 				factors.add(smallerFactor);
 				factors.add(factor.divide(smallerFactor));
 			}catch(FactorizationFailure e){
