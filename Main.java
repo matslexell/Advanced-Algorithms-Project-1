@@ -146,4 +146,20 @@ public class Main {
 		}
 	}
 
+	//Implements Sieve of Eratosthenes
+	public List<Long> getPrimesLessThan(long max){
+		HashSet<Long> composites = new HashSet<Long>();
+		List<Long> primes = new ArrayList<Long>();
+		for(long i = 2; i < max; i++){
+			if(! composites.contains(i)){
+				long prime = i;
+				primes.add(prime);
+				for(long comp = prime * 2; comp < max; comp += prime){
+					composites.add(comp);
+				}
+			}
+		}
+		return primes;
+	}
+
 }
