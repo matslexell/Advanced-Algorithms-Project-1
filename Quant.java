@@ -25,6 +25,7 @@ public class Quant {
 		return potentials;
 	}
 	
+//	public static ArrayList<BigInteger>
 	
 		
 	public static BigInteger biggerThanSqrt(BigInteger n){
