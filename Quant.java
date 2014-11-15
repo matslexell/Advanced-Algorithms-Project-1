@@ -139,7 +139,7 @@ public class Quant {
 
 	}
 
-	//A factor is the number itseöf, and the frequency
+	//A factor is the number itself, and the frequency
 	static class Factor {
 		//The factor can also be very big
 		BigInteger factor;
