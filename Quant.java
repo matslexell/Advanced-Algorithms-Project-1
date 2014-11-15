@@ -9,7 +9,7 @@ public class Quant {
 	 * This class performs the quantic seive algortihm
 	 */
 
-	public static final long PRIMELESSTHAN = 100;
+	public static final long SMOOTHNESS = 7;
 
 	public static ArrayList<BigInteger> genPVals(BigInteger n, int amount) {
 		BigInteger start = biggerThanSqrt(n);
@@ -53,7 +53,7 @@ public class Quant {
 			ArrayList<BigInteger> pVals) {
 
 		ArrayList<BigIntAndFactors> nonSmooth = copy(pVals);
-		ArrayList<BigInteger> primes = getPrimesLessThan(PRIMELESSTHAN);
+		ArrayList<BigInteger> primes = getPrimesLessThan(SMOOTHNESS + 1);
 		ArrayList<BigIntAndFactors> smooth = new ArrayList<BigIntAndFactors>();
 
 		for (int j = 0; j < nonSmooth.size(); j++) {
@@ -167,7 +167,7 @@ public class Quant {
 	public static void main(String[] args) {
 		BigInteger n = BigInteger.valueOf(20L);
 
-		ArrayList<BigInteger> p = Quant.genPVals(n, 10);
+		ArrayList<BigInteger> p = Quant.genPVals(n, 4);
 		System.out.println(p);
 
 		System.out.println(smoothing(p));
