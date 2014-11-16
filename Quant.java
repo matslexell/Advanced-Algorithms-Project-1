@@ -2,7 +2,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
-import org.apache.commons.math3.*;
 
 public class Quant {
 
