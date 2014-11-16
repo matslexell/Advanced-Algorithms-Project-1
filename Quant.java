@@ -1,7 +1,8 @@
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.Map;
 
 public class Quant {
 
@@ -10,7 +11,16 @@ public class Quant {
 	 */
 
 	public static final long SMOOTHNESS = 7;
+	public final static ArrayList<BigInteger> primes = getPrimesLessThan(SMOOTHNESS + 1);
 
+	/**
+	 * Input is the number n that we want to factor, the amount parameter
+	 * represents smoothness (how many a values will be created)
+	 * 
+	 * @param n
+	 * @param amount
+	 * @return
+	 */
 	public static ArrayList<BigInteger> genPVals(BigInteger n, int amount) {
 		BigInteger start = biggerThanSqrt(n);
 		System.out.println(start);
@@ -58,7 +68,7 @@ public class Quant {
 
 		for (int j = 0; j < nonSmooth.size(); j++) {
 			BigIntAndFactors b = nonSmooth.get(j);
-			BigInteger original = b.b;
+			BigInteger original = b.getPrime();
 
 			for (int i = 0; i < primes.size(); i++) {
 
@@ -70,7 +80,7 @@ public class Quant {
 				}
 
 				if (b.isOne()) {
-					b.b = original;
+					b.setPrime(original);
 					smooth.add(b);
 					break;
 				}
@@ -80,9 +90,10 @@ public class Quant {
 
 		return smooth;
 	}
-	
-	//TODO, next step! Produce matrix! DO NOT USE int[][], read up on sparse matrix
-	public static int[][] produceMatrix(){
+
+	// TODO, next step! Produce matrix! DO NOT USE int[][], read up on sparse
+	// matrix
+	public static int[][] produceMatrix() {
 		return null;
 	}
 
@@ -90,58 +101,18 @@ public class Quant {
 
 		ArrayList<BigIntAndFactors> array = new ArrayList<BigIntAndFactors>();
 		for (int i = 0; i < pVals.size(); i++) {
-			array.add(new BigIntAndFactors(pVals.get(i), i));
+			array.add(new BigIntAndFactors(pVals.get(i)));
 		}
 
 		return array;
 	}
 
-	//This class represents a number and all it's factors //TODO, seems legit, maybe test some more?
-	static class BigIntAndFactors {
-		BigInteger b;
-		LinkedList<Factor> primeFactors = new LinkedList<Factor>();
+	// This class represents a number and all it's factors //TODO, seems legit,
+	// maybe test some more?
 
-		// private ArrayList<Integer> freq = new ArrayList<Integer>();
-
-		BigIntAndFactors(BigInteger b, int idx) {
-			this.b = b;
-		}
-
-
-		void addFactor(BigInteger f) {
-
-			Factor factor = primeFactors.peekLast();
-			if (factor != null && factor.equals(f)) {
-				factor.inc();
-				return;
-			}
-			
-			primeFactors.add(new Factor(f));
-
-		}
-
-		void divideAndStoreFactor(BigInteger f) {
-			b = b.divide(f);
-			addFactor(f);
-		}
-
-		boolean isOne() {
-			return b.equals(BigInteger.ONE);
-		}
-
-		boolean isDivisible(BigInteger d) {
-			return b.mod(d).equals(BigInteger.ZERO);
-		}
-
-		public String toString() {
-			return b.toString() + ": " + primeFactors.toString();
-		}
-
-	}
-
-	//A factor is the number itself, and the frequency
+	// A factor is the number itself, and the frequency
 	static class Factor {
-		//The factor can also be very big
+		// The factor can also be very big
 		BigInteger factor;
 		int frequency;
 
@@ -165,12 +136,14 @@ public class Quant {
 	}
 
 	public static void main(String[] args) {
-		BigInteger n = BigInteger.valueOf(20L);
+		BigInteger n = BigInteger.valueOf(40L);
 
-		ArrayList<BigInteger> p = Quant.genPVals(n, 4);
+		ArrayList<BigInteger> p = Quant.genPVals(n, 20);
 		System.out.println(p);
 		ArrayList<BigIntAndFactors> smoothNumbers = smoothing(p);
 		System.out.println(smoothNumbers);
+		Matrix m = new Matrix(smoothNumbers);
+		System.out.println(m.toString());
 
 	}
 }
