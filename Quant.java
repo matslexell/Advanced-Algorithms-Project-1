@@ -68,23 +68,9 @@ public class Quant {
 
 		for (int j = 0; j < nonSmooth.size(); j++) {
 			BigIntAndFactors b = nonSmooth.get(j);
-			BigInteger original = b.getPrime();
-
-			for (int i = 0; i < primes.size(); i++) {
-
-				// Keep on deviding while mod is zero!
-				while (b.isDivisible(primes.get(i))) {
-
-					b.divideAndStoreFactor(primes.get(i));
-
-				}
-
-				if (b.isOne()) {
-					b.setPrime(original);
-					smooth.add(b);
-					break;
-				}
-
+			boolean isSmooth = b.computeAndSetFactors(primes);
+			if(isSmooth){
+				smooth.add(b);
 			}
 		}
 

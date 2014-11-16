@@ -1,6 +1,5 @@
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 class BigIntAndFactors {
 	private BigInteger b;
@@ -14,7 +13,7 @@ class BigIntAndFactors {
 		this.b = b;
 	}
 	
-	public void setPrime(BigInteger p){
+	private void setPrime(BigInteger p){
 		b = p;
 	}
 	
@@ -22,12 +21,26 @@ class BigIntAndFactors {
 		return b;
 	}
 
+	public boolean computeAndSetFactors(List<BigInteger> allowedFactors){
+		BigInteger original = b;
+		for(BigInteger factor : allowedFactors){
+			while(isDivisible(factor)){
+				divideAndStoreFactor(factor);
+			}
+			if (isOne()) {
+				setPrime(original);
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public byte getFactorFreq(int index) {
 		Byte i = map.get(Quant.primes.get(index));
 		return i == null ? 0 : i.byteValue();
 	}
 
-	public void addFactor(BigInteger f) {
+	private void addFactor(BigInteger f) {
 		increment(map, f);
 	}
 
@@ -37,8 +50,8 @@ class BigIntAndFactors {
 
 	private <E> void increment(Map<E, Byte> map, E key) {
 		if (map.containsKey(key)) {
-//			byte b = (byte) (map.get(key) + 1);
-			byte b = (byte) ((map.get(key) + 1) % 2);
+			byte b = (byte) (map.get(key) + 1);
+			// byte b = (byte) ((map.get(key) + 1) % 2);
 
 			map.put(key, b);
 		} else {
@@ -46,16 +59,16 @@ class BigIntAndFactors {
 		}
 	}
 
-	public void divideAndStoreFactor(BigInteger f) {
+	private void divideAndStoreFactor(BigInteger f) {
 		b = b.divide(f);
 		addFactor(f);
 	}
 
-	public boolean isOne() {
+	private boolean isOne() {
 		return b.equals(BigInteger.ONE);
 	}
 
-	public boolean isDivisible(BigInteger d) {
+	private boolean isDivisible(BigInteger d) {
 		return b.mod(d).equals(BigInteger.ZERO);
 	}
 
