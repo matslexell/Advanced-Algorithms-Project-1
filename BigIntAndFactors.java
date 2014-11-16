@@ -31,6 +31,10 @@ class BigIntAndFactors {
 		increment(map, f);
 	}
 
+	public void addFactorWithIndex(int index){
+		increment(map, Quant.primes.get(index));
+	}
+
 	private <E> void increment(Map<E, Byte> map, E key) {
 		if (map.containsKey(key)) {
 //			byte b = (byte) (map.get(key) + 1);
