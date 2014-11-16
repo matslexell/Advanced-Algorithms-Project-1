@@ -37,6 +37,7 @@ public class Matrix {
 	}
 
 	private void gaussEliminateDown(){
+		System.out.println("DOWN");
 		HashSet<Integer> usedRows = new HashSet<Integer>();
 		for(int col = 0; col < getNumCols(); col ++){
 			
@@ -68,7 +69,30 @@ public class Matrix {
 	}
 
 	private void gaussEliminateUp(){
-
+		System.out.println("UP");
+		for(int col = getNumCols() - 1; col >= 0; col --){
+			
+			System.out.println("col " + col);
+			int rowWithFirstOne = -1;
+			HashSet<Integer> additionalRowsWithAOne = new HashSet<Integer>();
+			for(int row = getNumRows() - 1; row >= 0 ; row --){
+				if(getFreq(row, col) == 1){
+					rowWithFirstOne = row;
+					break;
+				}
+			}
+			System.out.println("found row : " + rowWithFirstOne);
+			if(rowWithFirstOne != -1){
+				for(int row = rowWithFirstOne - 1; row >= 0; row --){
+					if(getFreq(row, col) == 1){
+						additionalRowsWithAOne.add(row);
+					}
+				}
+				System.out.println("sub " + rowWithFirstOne + " from  " + additionalRowsWithAOne);
+				subtractRowFromOthers(rowWithFirstOne, additionalRowsWithAOne);
+			}
+			System.out.println("After col " + col + ", m == \n" + toString());
+		}
 	}
 
 	private void subtractRowFromOthers(int rowIndex, HashSet<Integer> otherRowIndices){
