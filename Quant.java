@@ -2,6 +2,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
+import org.apache.commons.math3.*;
 
 public class Quant {
 
@@ -99,7 +100,7 @@ public class Quant {
 	//This class represents a number and all it's factors //TODO, seems legit, maybe test some more?
 	static class BigIntAndFactors {
 		BigInteger b;
-		LinkedList<Factor> factors = new LinkedList<Factor>();
+		LinkedList<Factor> primeFactors = new LinkedList<Factor>();
 
 		// private ArrayList<Integer> freq = new ArrayList<Integer>();
 
@@ -110,13 +111,13 @@ public class Quant {
 
 		void addFactor(BigInteger f) {
 
-			Factor factor = factors.peekLast();
+			Factor factor = primeFactors.peekLast();
 			if (factor != null && factor.equals(f)) {
 				factor.inc();
 				return;
 			}
 			
-			factors.add(new Factor(f));
+			primeFactors.add(new Factor(f));
 
 		}
 
@@ -134,7 +135,7 @@ public class Quant {
 		}
 
 		public String toString() {
-			return b.toString() + ": " + factors.toString();
+			return b.toString() + ": " + primeFactors.toString();
 		}
 
 	}
@@ -169,8 +170,8 @@ public class Quant {
 
 		ArrayList<BigInteger> p = Quant.genPVals(n, 4);
 		System.out.println(p);
-
-		System.out.println(smoothing(p));
+		ArrayList<BigIntAndFactors> smoothNumbers = smoothing(p);
+		System.out.println(smoothNumbers);
 
 	}
 }
