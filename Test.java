@@ -3,24 +3,27 @@ import java.util.*;
 import java.util.function.*;
 public class Test{
 	public static void test() throws FactorizationFailure{
-		Main m = new Main();
-		BigInteger a = BigInteger.valueOf(42);
-		BigInteger b = BigInteger.valueOf(12);
+		ArrayList<BigIntAndFactors> cols = new ArrayList<BigIntAndFactors>();
 
-		System.out.println("\ngcd(" + a + ", " + b + ") == " + m.gcd(a, b));
+		cols.add(new BigIntAndFactors(BigInteger.valueOf(30)));
+		cols.get(0).addFactor(BigInteger.valueOf(2));
+		cols.get(0).addFactor(BigInteger.valueOf(3));
+		cols.get(0).addFactor(BigInteger.valueOf(5));
 
-		System.out.println();
-		for(BigInteger x = BigInteger.valueOf(2); x.compareTo(BigInteger.valueOf(10)) <= 0; x = x.add(BigInteger.ONE)){
-			try{
-				System.out.println("pollardRho(" + x + ") == " + m.pollardRho(x));	
-			}catch(FactorizationFailure e){
-				System.out.println(x + " is prime.");
-			}
-		}
-		
-		BigInteger x = BigInteger.valueOf(982451653).multiply(BigInteger.valueOf(7919 * 7 * 3 * 3));
-		System.out.println("\nfactors(" + x + ") == " + m.getPrimeFactors(x));
-		x = BigInteger.valueOf(982451632).pow(2);
-		System.out.println("\nfactors(" + x + ") == " + m.getPrimeFactors(x));	
+		cols.add(new BigIntAndFactors(BigInteger.valueOf(5)));
+		cols.get(1).addFactor(BigInteger.valueOf(5));
+
+		cols.add(new BigIntAndFactors(BigInteger.valueOf(10)));
+		cols.get(2).addFactor(BigInteger.valueOf(2));
+		cols.get(2).addFactor(BigInteger.valueOf(5));
+
+		cols.add(new BigIntAndFactors(BigInteger.valueOf(35)));
+		cols.get(3).addFactor(BigInteger.valueOf(5));
+		cols.get(3).addFactor(BigInteger.valueOf(7));
+
+		Matrix m = new Matrix(cols);
+		System.out.println(m);
+		m.gaussEliminate();
+		System.out.println("\n" + m);
 	}
 }
