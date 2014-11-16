@@ -13,11 +13,11 @@ class BigIntAndFactors {
 		this.b = b;
 	}
 	
-	private void setPrime(BigInteger p){
+	private void setNumber(BigInteger p){
 		b = p;
 	}
 	
-	public BigInteger getPrime(){
+	public BigInteger getNumber(){
 		return b;
 	}
 
@@ -28,7 +28,7 @@ class BigIntAndFactors {
 				divideAndStoreFactor(factor);
 			}
 			if (isOne()) {
-				setPrime(original);
+				setNumber(original);
 				return true;
 			}
 		}

@@ -99,7 +99,7 @@ public class Matrix {
 		for(int colIndex = 0; colIndex < smoothNumbers.size(); colIndex ++){
 			if(getFreq(rowIndex, colIndex) == 1){ //if 0, subtraction has no effect
 				BigIntAndFactors col = smoothNumbers.get(colIndex);
-				BigIntAndFactors newCol = new BigIntAndFactors(col.getPrime());
+				BigIntAndFactors newCol = new BigIntAndFactors(col.getNumber());
 				// BigIntAndFactors newCol = (BigIntAndFactors) col.clone();
 				for(int otherIndex = 0; otherIndex < getNumRows(); otherIndex ++){
 					if(otherRowIndices.contains(otherIndex)){
