@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Stream;
 
-import javax.xml.parsers.FactoryConfigurationError;
 
 public class Quant {
 
@@ -15,7 +14,7 @@ public class Quant {
 	 * This class performs the quantic seive algortihm
 	 */
 
-	public static final long SMOOTHNESS = 10000;
+	public static final long SMOOTHNESS = 15000;
 	public final static ArrayList<BigInteger> primes = getPrimesLessThan(SMOOTHNESS + 1);
 
 	/**
@@ -27,13 +26,15 @@ public class Quant {
 	 * @return
 	 */
 	public static HashMap<BigInteger, BigInteger> genPVals(BigInteger n, int amount) {
+		System.out.println("generating p-values...");
 		BigInteger a0 = biggerThanSqrt(n);
-		System.out.println("first a: " + a0);
+//		System.out.println("first a: " + a0);
 		HashMap<BigInteger, BigInteger> pVals = new HashMap<BigInteger, BigInteger>();
 		
 		for (int i = 0; i < amount; i++) {
 			BigInteger a = a0.add(BigInteger.valueOf(i));
 			BigInteger p = a.pow(2).subtract(n);
+			assert(p.compareTo(BigInteger.ZERO) > 0);
 			pVals.put(p, a);
 		}
 
@@ -41,11 +42,13 @@ public class Quant {
 	}
 
 	public static BigInteger biggerThanSqrt(BigInteger n) {
-		int logApprx = n.toString(2).length();
+//		int logApprx = n.toString(2).length();
 //		System.out.println("Input: " + n.intValue());
 //		System.out.println("Log app: " + logApprx);
 //		System.out.println("2^" + logApprx + " is " + Math.pow(2, logApprx));
-		return BigInteger.valueOf(2).pow((int) Math.ceil(logApprx * 1.0 / 2));
+		
+//		return BigInteger.valueOf(2).pow((int) Math.ceil(logApprx * 1.0 / 2));
+		return BigInteger.valueOf((long)Math.sqrt(n.doubleValue()));
 	}
 
 	// Implements Sieve of Eratosthenes
@@ -69,7 +72,7 @@ public class Quant {
 
 	public static HashMap<BigIntAndFactors, BigInteger> smoothing(
 			HashMap<BigInteger, BigInteger> pVals) {
-
+		System.out.println("Smoothing...");
 		ArrayList<BigIntAndFactors> nonSmooth = copy(pVals.keySet());
 		ArrayList<BigInteger> primes = getPrimesLessThan(SMOOTHNESS + 1);
 		HashMap<BigIntAndFactors, BigInteger> smooth = new HashMap<BigIntAndFactors, BigInteger>();
@@ -130,12 +133,12 @@ public class Quant {
 	}
 	
 	public static BigInteger getFactor(BigInteger n) throws FactorizationFailure{
-		System.out.println("We wanna factor " + n);
-		HashMap<BigInteger, BigInteger> pVals = Quant.genPVals(n, 1000);
+		System.out.println("We wanna factor n = " + n);
+		HashMap<BigInteger, BigInteger> pVals = Quant.genPVals(n, 10 * 1000);
 		
-		System.out.println(pVals.size() + " p-values: " + pVals);
+		System.out.println(pVals.size() + " p-values: ");// + pVals);
 		HashMap<BigIntAndFactors, BigInteger> smoothPVals = smoothing(pVals);
-		System.out.println(smoothPVals.size() + " smooth numbers: " + smoothPVals);
+		System.out.println(smoothPVals.size() + " smooth numbers: ");// + smoothPVals);
 		List<BigIntAndFactors> columns = Arrays.asList(smoothPVals.keySet().toArray(new BigIntAndFactors[]{})); 
 		Matrix m = new Matrix(columns);
 		m.gaussEliminate();
@@ -152,7 +155,7 @@ public class Quant {
 			BigInteger A = BigInteger.ONE;
 			for(BigInteger chosen : (Iterable<BigInteger>)chosenNumbers::iterator){
 
-				System.out.println("chosen: " + chosen + "  (a = " + pVals.get(chosen) + ")");
+//				System.out.println("chosen: " + chosen + "  (a = " + pVals.get(chosen) + ")");
 				S = S.multiply(chosen);
 				A = A.multiply(pVals.get(chosen));	
 			}
@@ -180,7 +183,7 @@ public class Quant {
 	}
 
 	public static void main(String[] args) throws FactorizationFailure {
-		BigInteger n = BigInteger.valueOf(138838).multiply(BigInteger.valueOf(34983));
+		BigInteger n = BigInteger.valueOf(138838153535L).multiply(BigInteger.valueOf(349115351325L));
 		BigInteger factor = getFactor(n);
 		System.out.println("factor = " + factor);
 		

@@ -43,7 +43,8 @@ public class Matrix {
 	}
 
 	private void gaussEliminateDown(){
-//		System.out.println(getNumRows() + " x " + getNumCols());
+		System.out.println("Gauss elimination (down)...");
+		System.out.println(getNumRows() + " x " + getNumCols());
 //		System.out.println("DOWN");
 		HashSet<Integer> usedRows = new HashSet<Integer>();
 		for(int col = 0; col < getNumCols(); col ++){
@@ -76,6 +77,7 @@ public class Matrix {
 	}
 
 	private void gaussEliminateUp(){
+		System.out.println("Gauss elimination (up)...");
 //		System.out.println("UP");
 		for(int col = getNumCols() - 1; col >= 0; col --){
 			
@@ -130,13 +132,14 @@ public class Matrix {
 	 * @return
 	 */
 	public List<ArrayList<Integer>> getSomeNonTrivialSolutions(){
+		System.out.println("Extracting solutions from reduced matrix...");
 		HashSet<Integer> lockedZeros = new HashSet<Integer>();
 		HashMap<Integer, ArrayList<Integer>> equalToSum = new HashMap<Integer, ArrayList<Integer>>();
 		HashSet<Integer> unbound = new HashSet<Integer>();
 		getHintsAboutMatrixSolution(lockedZeros, equalToSum, unbound);
-		System.out.println("lockedZero: " + lockedZeros);
-		System.out.println("constraints: " + equalToSum);
-		System.out.println("unbound: " + unbound);
+//		System.out.println("lockedZero: " + lockedZeros);
+//		System.out.println("constraints: " + equalToSum);
+//		System.out.println("unbound: " + unbound);
 		List<ArrayList<Integer>> solutions = new ArrayList<ArrayList<Integer>>();
 		
 		//There is a critical assumption here.
@@ -151,7 +154,7 @@ public class Matrix {
 			for(int constrained : equalToSum.keySet()){
 				int sum = equalToSum.get(constrained).stream().mapToInt(x -> solution.contains(x)? 1 : 0).sum();
 				if(sum % 2 == 1){
-					System.out.println("add " + constrained + " since sum(" + equalToSum.get(constrained) + ") == " + sum);
+//					System.out.println("add " + constrained + " since sum(" + equalToSum.get(constrained) + ") == " + sum);
 					solution.add(constrained);
 				}
 			}
