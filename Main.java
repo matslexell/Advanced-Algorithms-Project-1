@@ -40,7 +40,7 @@ public class Main {
 	* Return the greatest common divisor of two numbers.
 	* For instance gcd(42, 12) == 6
 	*/
-	public BigInteger gcd(BigInteger a, BigInteger b){
+	public static BigInteger gcd(BigInteger a, BigInteger b){
 		BigInteger t;
 		while(b != BigInteger.ZERO){
 			t = b;
