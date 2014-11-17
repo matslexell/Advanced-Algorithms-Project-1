@@ -1,8 +1,13 @@
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.List;
+import java.util.stream.Stream;
+
+import javax.xml.parsers.FactoryConfigurationError;
 
 public class Quant {
 
@@ -10,7 +15,7 @@ public class Quant {
 	 * This class performs the quantic seive algortihm
 	 */
 
-	public static final long SMOOTHNESS = 7;
+	public static final long SMOOTHNESS = 10000;
 	public final static ArrayList<BigInteger> primes = getPrimesLessThan(SMOOTHNESS + 1);
 
 	/**
@@ -21,22 +26,25 @@ public class Quant {
 	 * @param amount
 	 * @return
 	 */
-	public static ArrayList<BigInteger> genPVals(BigInteger n, int amount) {
-		BigInteger start = biggerThanSqrt(n);
-		System.out.println(start);
-		ArrayList<BigInteger> potentials = new ArrayList<BigInteger>();
+	public static HashMap<BigInteger, BigInteger> genPVals(BigInteger n, int amount) {
+		BigInteger a0 = biggerThanSqrt(n);
+		System.out.println("first a: " + a0);
+		HashMap<BigInteger, BigInteger> pVals = new HashMap<BigInteger, BigInteger>();
+		
 		for (int i = 0; i < amount; i++) {
-			potentials.add(start.add(BigInteger.valueOf(i)).pow(2).subtract(n));
+			BigInteger a = a0.add(BigInteger.valueOf(i));
+			BigInteger p = a.pow(2).subtract(n);
+			pVals.put(p, a);
 		}
 
-		return potentials;
+		return pVals;
 	}
 
 	public static BigInteger biggerThanSqrt(BigInteger n) {
 		int logApprx = n.toString(2).length();
-		System.out.println("Input: " + n.intValue());
-		System.out.println("Log app: " + logApprx);
-		System.out.println("2^" + logApprx + " is " + Math.pow(2, logApprx));
+//		System.out.println("Input: " + n.intValue());
+//		System.out.println("Log app: " + logApprx);
+//		System.out.println("2^" + logApprx + " is " + Math.pow(2, logApprx));
 		return BigInteger.valueOf(2).pow((int) Math.ceil(logApprx * 1.0 / 2));
 	}
 
@@ -59,18 +67,18 @@ public class Quant {
 		return primes;
 	}
 
-	public static ArrayList<BigIntAndFactors> smoothing(
-			ArrayList<BigInteger> pVals) {
+	public static HashMap<BigIntAndFactors, BigInteger> smoothing(
+			HashMap<BigInteger, BigInteger> pVals) {
 
-		ArrayList<BigIntAndFactors> nonSmooth = copy(pVals);
+		ArrayList<BigIntAndFactors> nonSmooth = copy(pVals.keySet());
 		ArrayList<BigInteger> primes = getPrimesLessThan(SMOOTHNESS + 1);
-		ArrayList<BigIntAndFactors> smooth = new ArrayList<BigIntAndFactors>();
+		HashMap<BigIntAndFactors, BigInteger> smooth = new HashMap<BigIntAndFactors, BigInteger>();
 
 		for (int j = 0; j < nonSmooth.size(); j++) {
 			BigIntAndFactors b = nonSmooth.get(j);
 			boolean isSmooth = b.computeAndSetFactors(primes);
 			if(isSmooth){
-				smooth.add(b);
+				smooth.put(b, pVals.get(b.getNumber()));
 			}
 		}
 
@@ -83,11 +91,11 @@ public class Quant {
 		return null;
 	}
 
-	public static ArrayList<BigIntAndFactors> copy(ArrayList<BigInteger> pVals) {
+	public static ArrayList<BigIntAndFactors> copy(Collection<BigInteger> pVals) {
 
 		ArrayList<BigIntAndFactors> array = new ArrayList<BigIntAndFactors>();
-		for (int i = 0; i < pVals.size(); i++) {
-			array.add(new BigIntAndFactors(pVals.get(i)));
+		for (BigInteger p : pVals) {
+			array.add(new BigIntAndFactors(p));
 		}
 
 		return array;
@@ -120,16 +128,63 @@ public class Quant {
 		}
 
 	}
+	
+	public static BigInteger getFactor(BigInteger n) throws FactorizationFailure{
+		System.out.println("We wanna factor " + n);
+		HashMap<BigInteger, BigInteger> pVals = Quant.genPVals(n, 1000);
+		
+		System.out.println(pVals.size() + " p-values: " + pVals);
+		HashMap<BigIntAndFactors, BigInteger> smoothPVals = smoothing(pVals);
+		System.out.println(smoothPVals.size() + " smooth numbers: " + smoothPVals);
+		List<BigIntAndFactors> columns = Arrays.asList(smoothPVals.keySet().toArray(new BigIntAndFactors[]{})); 
+		Matrix m = new Matrix(columns);
+		m.gaussEliminate();
+//		System.out.println(m.toString());
+		List<ArrayList<Integer>> solutions = m.getSomeNonTrivialSolutions();
+		System.out.println("num solutions: " + solutions.size());
+		for(ArrayList<Integer> solution : solutions){
+			System.out.println("\nsolution: " + solution);
+			Stream<BigInteger> chosenNumbers = solution.stream().map(i -> columns.get(i).getNumber());
+			
+//			System.out.println("Product of " + Arrays.toString(chosenNumbers.toArray()) + " is a square");
+			
+			BigInteger S = BigInteger.ONE;
+			BigInteger A = BigInteger.ONE;
+			for(BigInteger chosen : (Iterable<BigInteger>)chosenNumbers::iterator){
 
-	public static void main(String[] args) {
-		BigInteger n = BigInteger.valueOf(40L);
-
-		ArrayList<BigInteger> p = Quant.genPVals(n, 20);
-		System.out.println(p);
-		ArrayList<BigIntAndFactors> smoothNumbers = smoothing(p);
-		System.out.println(smoothNumbers);
-		Matrix m = new Matrix(smoothNumbers);
-		System.out.println(m.toString());
-
+				System.out.println("chosen: " + chosen + "  (a = " + pVals.get(chosen) + ")");
+				S = S.multiply(chosen);
+				A = A.multiply(pVals.get(chosen));	
+			}
+			System.out.println("S = " + S);
+			BigInteger sqrtS = BigInteger.valueOf((long)Math.round(Math.sqrt(S.doubleValue())));
+			BigInteger containsFactor1 = A.subtract(sqrtS);
+			BigInteger containsFactor2 = A.add(sqrtS);
+			System.out.println(containsFactor1);
+			System.out.println(containsFactor2);
+			BigInteger factor1 = Main.gcd(n, containsFactor1);
+			System.out.println("factor1: " + factor1);
+			BigInteger factor2 = Main.gcd(n, containsFactor2);
+			System.out.println("factor2: " + factor2);
+			if(! factor1.equals(BigInteger.ONE) && ! factor1.equals(n)){
+				
+				return factor1;
+			}
+			if(! factor2.equals(BigInteger.ONE) && ! factor2.equals(n)){
+				
+				return factor2;
+			}
+		}
+		throw new FactorizationFailure("Couldn't factor " + n);
+		
 	}
+
+	public static void main(String[] args) throws FactorizationFailure {
+		BigInteger n = BigInteger.valueOf(138838).multiply(BigInteger.valueOf(34983));
+		BigInteger factor = getFactor(n);
+		System.out.println("factor = " + factor);
+		
+	}
+	
+
 }

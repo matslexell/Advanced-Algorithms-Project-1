@@ -10,6 +10,16 @@ public class Test{
 		// System.out.println(b);			
 
 		testGauss();
+		
+		
+//		BigInteger n = BigInteger.valueOf(100);
+//		double logApprx = Math.log(n.doubleValue());
+//		System.out.println(logApprx);
+////		System.out.println("Input: " + n.intValue());
+////		System.out.println("Log app: " + logApprx);
+////		System.out.println("2^" + logApprx + " is " + Math.pow(2, logApprx));
+//		System.out.println(Math.pow(Math.E, logApprx * 1.0 / 2));
+//		System.out.println(Math.sqrt((double)100));
 	}
 
 
@@ -21,23 +31,30 @@ public class Test{
 
 
 		ArrayList<BigInteger> primes = Quant.getPrimesLessThan(20);
+		
+		
 
 
-		cols.add(new BigIntAndFactors(BigInteger.valueOf(30)));
+		cols.add(new BigIntAndFactors(BigInteger.valueOf(2)));
 		cols.get(0).computeAndSetFactors(primes);
 
-		cols.add(new BigIntAndFactors(BigInteger.valueOf(5)));
+		cols.add(new BigIntAndFactors(BigInteger.valueOf(2)));
 		cols.get(1).computeAndSetFactors(primes);
 
-		cols.add(new BigIntAndFactors(BigInteger.valueOf(10)));
+		cols.add(new BigIntAndFactors(BigInteger.valueOf(3)));
 		cols.get(2).computeAndSetFactors(primes);
-
-		cols.add(new BigIntAndFactors(BigInteger.valueOf(35)));
+		
+		cols.add(new BigIntAndFactors(BigInteger.valueOf(6)));
 		cols.get(3).computeAndSetFactors(primes);
 
 		Matrix m = new Matrix(cols);
 		System.out.println(m);
 		m.gaussEliminate();
 		System.out.println("\n" + m);
+		
+		List<ArrayList<Integer>> solutions = m.getSomeNonTrivialSolutions();
+		for(ArrayList<Integer> solution : solutions) {
+			System.out.println("Product of " + Arrays.toString(solution.stream().mapToInt(i -> cols.get(i).getNumber().intValue()).toArray()) + " is a square");
+		}
 	}
 }

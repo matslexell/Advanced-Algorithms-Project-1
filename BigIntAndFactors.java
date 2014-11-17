@@ -5,10 +5,6 @@ class BigIntAndFactors {
 	private BigInteger b;
 	private HashMap<BigInteger, Byte> map = new HashMap<BigInteger, Byte>();
 
-	// LinkedList<Factor> primeFactors = new LinkedList<Factor>();
-
-	// private ArrayList<Integer> freq = new ArrayList<Integer>();
-
 	public BigIntAndFactors(BigInteger b) {
 		this.b = b;
 	}
@@ -50,8 +46,8 @@ class BigIntAndFactors {
 
 	private <E> void increment(Map<E, Byte> map, E key) {
 		if (map.containsKey(key)) {
-			byte b = (byte) (map.get(key) + 1);
-			// byte b = (byte) ((map.get(key) + 1) % 2);
+//			byte b = (byte) (map.get(key) + 1);
+			byte b = (byte) ((map.get(key) + 1) % 2);
 
 			map.put(key, b);
 		} else {
@@ -75,5 +71,10 @@ class BigIntAndFactors {
 	public String toString() {
 		return b.toString() + ": " + map.toString();
 	}
+	
+//	@Override
+//	public int hashCode(){
+//		return b.hashCode(); 
+//	}
 
 }
