@@ -12,7 +12,7 @@ public class Main {
 	}
 
 	public static void main(String[] args) throws FactorizationFailure{
-		project1(9008081532L);
+		project1();
 	}
 	
 	private static void test1(){
@@ -34,12 +34,8 @@ public class Main {
 		testFactorProductOf(factors);
 	}
 	
-	private static void project1(long personalNumber){
-		int j = 0;
-		
-		BigInteger firstNumber = BigInteger.valueOf(personalNumber).multiply(BigInteger.valueOf(10).pow(60 + j));
-		for(int i = 0; i < 200; i++){
-			BigInteger number = firstNumber.add(BigInteger.valueOf(i));
+	private static void project1(){
+		for(BigInteger number : NGenerator.genNumbers()){
 			Map<BigInteger, Integer> factors = getPrimeFactors(number);
 			System.out.println(factors);
 			System.out.println(validateFactors(factors, number));

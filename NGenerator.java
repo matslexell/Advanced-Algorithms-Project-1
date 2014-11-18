@@ -29,7 +29,4 @@ public class NGenerator {
 		return BigInteger.valueOf(P).multiply(big).add(BigInteger.valueOf(i));
 	}
 
-	public static void main(String[] args) {
-		new NGenerator();
-	}
 }
