@@ -23,7 +23,7 @@ public class Naive {
 	*/
 	public static BigInteger gcd(BigInteger a, BigInteger b){
 		BigInteger t;
-		while(b != BigInteger.ZERO){
+		while(! b.equals(BigInteger.ZERO)){
 			t = b;
 			b = a.mod(b);
 			a = t;
