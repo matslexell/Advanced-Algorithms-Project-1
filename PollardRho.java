@@ -41,14 +41,15 @@ public class PollardRho {
 		int i = 0; 
 		while(d.equals(BigInteger.ONE)){
 			i ++;
-			if(i % 10000 == 0){
-				Printer.POLLARD_RHO.print(i);
+			if(i % (100 * 1000) == 0){
+				Printer.POLLARD_RHO.print(".");
 			}
 			x = g.apply(x);
 			y = g.apply(g.apply(y));
 			d = Naive.gcd(x.subtract(y).abs(), n);
 			// Printer.POLLARD.print(x + ", " + y + ", " + d);
 		}
+		Printer.POLLARD_RHO.println(".");
 		if(d.equals(n)){
 			throw new FactorizationFailure("Failed to factorize " + n + ". (x:" + x + ", y:" + y + ", d:" + d + ")");
 		}

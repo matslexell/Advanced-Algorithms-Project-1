@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 public class QuadrSieve {
 
-	public static final long SMOOTHNESS = 500 * 1000;
+	public static final long SMOOTHNESS = 300 * 1000;
 	public final static List<Long> primes = Naive.getPrimesLessThan(SMOOTHNESS + 1);
 
 	/**
@@ -50,14 +50,16 @@ public class QuadrSieve {
 		TreeMap<BigIntAndFactors, BigInteger> smooth = new TreeMap<BigIntAndFactors, BigInteger>();
 
 		for (int j = 0; j < nonSmooth.size(); j++) {
-			
+			if(j % 1000 == 0){
+				Printer.QUADR_SIEVE.print(".");	
+			}
 			BigIntAndFactors b = nonSmooth.get(j);
-//			System.out.println("check if " + b + " is smooth");
 			boolean isSmooth = b.computeAndSetFactors(primes);
 			if(isSmooth){
 				smooth.put(b, pVals.get(b.getNumber()));
 			}
 		}
+		Printer.QUADR_SIEVE.println(".");
 
 		return smooth;
 	}
@@ -170,7 +172,7 @@ public class QuadrSieve {
 	
 	public static BigInteger getFactor(BigInteger n) throws FactorizationFailure{
 		
-		TreeMap<BigInteger, BigInteger> pVals = QuadrSieve.genPVals(n, 20 * 1000);
+		TreeMap<BigInteger, BigInteger> pVals = QuadrSieve.genPVals(n, 10 * 1000);
 		Printer.QUADR_SIEVE.println(pVals.size() + " p-values: ");// + pVals);
 		TreeMap<BigIntAndFactors, BigInteger> smoothPVals = smoothing(pVals);
 		Printer.QUADR_SIEVE.println(smoothPVals.size() + " smooth numbers: ");// + smoothPVals);
@@ -180,7 +182,7 @@ public class QuadrSieve {
 		Printer.QUADR_SIEVE.println("num solutions: " + solutions.size());
 		for(int solIndex = 0; solIndex < solutions.size(); solIndex++){
 			ArrayList<Integer> solution = solutions.get(solIndex);
-			Printer.QUADR_SIEVE.println("\nsolution" + solIndex + ": " + solution);
+			Printer.QUADR_SIEVE.println("solution " + solIndex + ": " + solution);
 			Stream<BigInteger> chosenNumbers = solution.stream().map(i -> columns.get(i).getNumber());
 			
 //			Printer.QUADR_SIEVE.println("Product of " + Arrays.toString(chosenNumbers.toArray()) + " is a square");
@@ -193,16 +195,14 @@ public class QuadrSieve {
 				S = S.multiply(chosen);
 				A = A.multiply(pVals.get(chosen));	
 			}
-			Printer.QUADR_SIEVE.println("S = " + S);
+//			Printer.QUADR_SIEVE.println("S = " + S);
 			BigInteger sqrtS = BigInteger.valueOf((long)Math.round(Math.sqrt(S.doubleValue())));
 			BigInteger containsFactor1 = A.subtract(sqrtS);
 			BigInteger containsFactor2 = A.add(sqrtS);
-			Printer.QUADR_SIEVE.println("contains a factor: " + containsFactor1);
-			Printer.QUADR_SIEVE.println("also contains a factor: " + containsFactor2);
+//			Printer.QUADR_SIEVE.println("contains a factor: " + containsFactor1);
+//			Printer.QUADR_SIEVE.println("also contains a factor: " + containsFactor2);
 			BigInteger factor1 = Naive.gcd(n, containsFactor1);
-			Printer.QUADR_SIEVE.println("found factor 1: " + factor1);
-			BigInteger factor2 = Naive.gcd(n, containsFactor2);
-			Printer.QUADR_SIEVE.println("found factor 2: " + factor2);
+			BigInteger factor2 = Naive.gcd(n, containsFactor2);	
 			List<BigInteger> nonTrivialFactors = new ArrayList<BigInteger>();
 			if(! factor1.equals(BigInteger.ONE) && ! factor1.equals(n)){
 				nonTrivialFactors.add(factor1);
@@ -211,6 +211,7 @@ public class QuadrSieve {
 				nonTrivialFactors.add(factor2);
 			}
 			if(! nonTrivialFactors.isEmpty()){
+				Printer.QUADR_SIEVE.println("found factors: " + factor1 + " and " + factor2);
 				return nonTrivialFactors.stream().max(BigInteger::compareTo).get();
 			}
 		}

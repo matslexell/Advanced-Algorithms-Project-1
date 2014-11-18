@@ -19,8 +19,8 @@ public enum Printer {
 		VERBOSE.put("MAIN", true);
 		VERBOSE.put("MATRIX", false);
 		VERBOSE.put("NAIVE", false);
-		VERBOSE.put("POLLARD_RHO", false);
-		VERBOSE.put("QUADR_SIEVE", false);
+		VERBOSE.put("POLLARD_RHO", true);
+		VERBOSE.put("QUADR_SIEVE", true);
 	}
 
 	public void print(Object msg) {
