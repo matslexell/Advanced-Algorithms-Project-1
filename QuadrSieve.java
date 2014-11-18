@@ -1,3 +1,4 @@
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,7 +10,7 @@ import java.util.stream.Stream;
 
 public class QuadrSieve {
 
-	public static final long SMOOTHNESS = 300 * 1000;
+	public static final long SMOOTHNESS = 25 * 1000 * 1000;
 	public final static List<Long> primes = Naive.getPrimesLessThan(SMOOTHNESS + 1);
 
 	/**
@@ -23,6 +24,10 @@ public class QuadrSieve {
 	public static TreeMap<BigInteger, BigInteger> genPVals(BigInteger n, int amount) {
 		Printer.QUADR_SIEVE.println("generating p-values...");
 		BigInteger a0 = biggerThanSqrt(n);
+		Printer.QUADR_SIEVE.println("a0: " + a0);
+//		System.out.println(a0.pow(2));
+//		System.out.println(n);
+//		System.out.println(a0.pow(2).equals(n));
 //		Printer.QUADR_SIEVE.println("first a: " + a0);
 		TreeMap<BigInteger, BigInteger> pVals = new TreeMap<BigInteger, BigInteger>();
 		
@@ -38,7 +43,8 @@ public class QuadrSieve {
 	}
 
 	public static BigInteger biggerThanSqrt(BigInteger n) {
-		return BigInteger.valueOf((long)Math.sqrt(n.doubleValue()));
+		double nDouble = n.doubleValue() * 1.1;
+		return BigDecimal.valueOf(Math.sqrt(nDouble)).toBigInteger();
 	}
 
 	
@@ -172,7 +178,7 @@ public class QuadrSieve {
 	
 	public static BigInteger getFactor(BigInteger n) throws FactorizationFailure{
 		
-		TreeMap<BigInteger, BigInteger> pVals = QuadrSieve.genPVals(n, 10 * 1000);
+		TreeMap<BigInteger, BigInteger> pVals = QuadrSieve.genPVals(n,   500);
 		Printer.QUADR_SIEVE.println(pVals.size() + " p-values: ");// + pVals);
 		TreeMap<BigIntAndFactors, BigInteger> smoothPVals = smoothing(pVals);
 		Printer.QUADR_SIEVE.println(smoothPVals.size() + " smooth numbers: ");// + smoothPVals);

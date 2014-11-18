@@ -44,7 +44,7 @@ public class PollardRho {
 			if(i % (100 * 1000) == 0){
 				Printer.POLLARD_RHO.print(".");
 			}
-			if(i == 500 * 1000){
+			if(i == 110 * 1000){
 				throw new FactorizationFailure("Took too long to factorize " + n);
 			}
 			
