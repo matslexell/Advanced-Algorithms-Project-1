@@ -14,7 +14,7 @@ public class Quant {
 	 * This class performs the quantic seive algortihm
 	 */
 
-	public static final long SMOOTHNESS = 15000;
+	public static final long SMOOTHNESS = 15 * 1000;
 	public final static ArrayList<BigInteger> primes = getPrimesLessThan(SMOOTHNESS + 1);
 
 	/**
@@ -87,13 +87,41 @@ public class Quant {
 
 		return smooth;
 	}
+	
+	
+	//not correct
+	public static HashMap<BigIntAndFactors, BigInteger> smoothing2(
+			HashMap<BigInteger, BigInteger> pVals) {
+		BigInteger biggestPVal = pVals.keySet().stream().max(BigInteger::compareTo).get();
+		System.out.println("biggest p : " + biggestPVal);
+		HashMap<BigInteger, BigIntAndFactors> composites = new HashMap<BigInteger, BigIntAndFactors>();
+		HashSet<BigInteger> primes = new HashSet<BigInteger>();
+		for(BigInteger i = BigInteger.valueOf(2); i.compareTo(BigInteger.valueOf(SMOOTHNESS)) <= 0; i = i.add(BigInteger.ONE)){
+			if(!composites.containsKey(i)){
+				BigInteger prime = i;
+				System.out.println("p " + prime);
+				primes.add(prime);
+				for(BigInteger comp = prime.multiply(BigInteger.valueOf(2)); comp.compareTo(biggestPVal) <= 0; comp = comp.add(prime)){
+					if(comp.divideAndRemainder(BigInteger.valueOf(10000000))[1].equals(BigInteger.ZERO))
+						System.out.println(comp);
+				}
+			}
+		}
 
-	// TODO, next step! Produce matrix! DO NOT USE int[][], read up on sparse
-	// matrix
-	public static int[][] produceMatrix() {
-		return null;
+		HashMap<BigIntAndFactors, BigInteger> smoothValues = new HashMap<BigIntAndFactors, BigInteger>();
+		for(BigInteger p : pVals.keySet()){
+			if(primes.contains(p)){
+				smoothValues.put(new BigIntAndFactors(p), pVals.get(p));
+			}else if(composites.containsKey(p) && composites.get(p).isOne()){
+				smoothValues.put(composites.get(p), pVals.get(p));
+			}
+		}
+		
+		return smoothValues;
 	}
-
+	
+	
+	
 	public static ArrayList<BigIntAndFactors> copy(Collection<BigInteger> pVals) {
 
 		ArrayList<BigIntAndFactors> array = new ArrayList<BigIntAndFactors>();
@@ -137,7 +165,7 @@ public class Quant {
 		HashMap<BigInteger, BigInteger> pVals = Quant.genPVals(n, 10 * 1000);
 		
 		System.out.println(pVals.size() + " p-values: ");// + pVals);
-		HashMap<BigIntAndFactors, BigInteger> smoothPVals = smoothing(pVals);
+		HashMap<BigIntAndFactors, BigInteger> smoothPVals = smoothing2(pVals);
 		System.out.println(smoothPVals.size() + " smooth numbers: ");// + smoothPVals);
 		List<BigIntAndFactors> columns = Arrays.asList(smoothPVals.keySet().toArray(new BigIntAndFactors[]{})); 
 		Matrix m = new Matrix(columns);
@@ -183,10 +211,16 @@ public class Quant {
 	}
 
 	public static void main(String[] args) throws FactorizationFailure {
-		BigInteger n = BigInteger.valueOf(138838153535L).multiply(BigInteger.valueOf(349115351325L));
+		BigInteger n = BigInteger.valueOf(8493618392L);
+//		n = n.multiply(BigInteger.valueOf(1957293013L));
+//		n = n.multiply(BigInteger.valueOf(3276510382L));
+//		n = n.multiply(BigInteger.valueOf(1570882310L));
+//		n = n.multiply(BigInteger.valueOf(9987231111L));
 		BigInteger factor = getFactor(n);
 		System.out.println("factor = " + factor);
-		
+		BigInteger[] divRes = n.divideAndRemainder(factor);
+		System.out.println(n + "  /  " + factor + "  ==  " + divRes[0] + " with remainder " + divRes[1]);
+		assert(divRes[1].equals(BigInteger.ZERO));
 	}
 	
 

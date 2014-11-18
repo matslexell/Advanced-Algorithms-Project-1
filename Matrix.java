@@ -1,24 +1,28 @@
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 public class Matrix {
-	List<BigIntAndFactors> smoothNumbers = new ArrayList<BigIntAndFactors>();
+	//One column is a smooth number
+	List<BigIntAndFactors> columns = new ArrayList<BigIntAndFactors>();
 
 	public Matrix(List<BigIntAndFactors> smoothNumbers){
-		this.smoothNumbers = smoothNumbers;
+		this.columns = smoothNumbers;
 	}
 	
 	
 	
 	public int getFreq(int row, int col) {
-		return smoothNumbers.get(col).getFactorFreq(row);
+		return columns.get(col).getFactorFreq(row);
 	}
 
 	public int getNumCols() {
-		return smoothNumbers.size();
+		return columns.size();
 	}
 
 	public int getNumRows() {
@@ -48,80 +52,101 @@ public class Matrix {
 //		System.out.println("DOWN");
 		HashSet<Integer> usedRows = new HashSet<Integer>();
 		for(int col = 0; col < getNumCols(); col ++){
+			BigIntAndFactors colVector = columns.get(col);
 			
-//			System.out.println("col " + col);
-			int rowWithFirstOne = -1;
-			HashSet<Integer> additionalRowsWithAOne = new HashSet<Integer>();
-			for(int row = 0; row < getNumRows() ; row ++){
-				if(usedRows.contains(row)){
-					continue;
-				}
-				if(getFreq(row, col) == 1){
-					rowWithFirstOne = row;
-					usedRows.add(row);
-					break;
-				}
+			Iterator<Integer> indicesOfOnes = colVector.getIndicesOfOnes();
+			if(indicesOfOnes.hasNext()){
+				Integer firstOneInCol = indicesOfOnes.next();
+				usedRows.add(firstOneInCol);
+				subtractRowFromOthers2(firstOneInCol, indicesOfOnes);
 			}
-//			System.out.println("found row : " + rowWithFirstOne);
-			if(rowWithFirstOne != -1){
-				for(int row = rowWithFirstOne + 1; row < getNumRows(); row ++){
-					if(getFreq(row, col) == 1){
-						additionalRowsWithAOne.add(row);
-					}
-				}
-//				System.out.println("sub " + rowWithFirstOne + " from  " + additionalRowsWithAOne);
-				subtractRowFromOthers(rowWithFirstOne, additionalRowsWithAOne);
-			}
-//			System.out.println("After col " + col + ", m == \n" + toString());
+			
+			
+			
+			
+//			for(int row = 0; row < getNumRows() ; row ++){
+//				if(usedRows.contains(row)){
+//					continue;
+//				}
+//				if(getFreq(row, col) == 1){
+//					rowWithFirstOne = row;
+//					usedRows.add(row);
+//					break;
+//				}
+//			}
+//			
+			
+//			
+//			
+////			System.out.println("found row : " + rowWithFirstOne);
+//			if(rowWithFirstOne != -1){
+//				for(int row = rowWithFirstOne + 1; row < getNumRows(); row ++){
+//					if(getFreq(row, col) == 1){
+//						additionalRowsWithAOne.add(row);
+//					}
+//				}
+////				System.out.println("sub " + rowWithFirstOne + " from  " + additionalRowsWithAOne);
+//				subtractRowFromOthers(rowWithFirstOne, additionalRowsWithAOne);
+//			}
+////			System.out.println("After col " + col + ", m == \n" + toString());
 		}
 	}
 
 	private void gaussEliminateUp(){
 		System.out.println("Gauss elimination (up)...");
 //		System.out.println("UP");
+		
+		
 		for(int col = getNumCols() - 1; col >= 0; col --){
+			BigIntAndFactors colVector = columns.get(col);
 			
-//			System.out.println("col " + col);
-			int rowWithFirstOne = -1;
-			HashSet<Integer> additionalRowsWithAOne = new HashSet<Integer>();
-			for(int row = getNumRows() - 1; row >= 0 ; row --){
-				if(getFreq(row, col) == 1){
-					rowWithFirstOne = row;
-					break;
-				}
+			Iterator<Integer> indicesOfOnes = colVector.getIndicesOfOnes();
+			if(indicesOfOnes.hasNext()){
+				Integer firstOneInCol = indicesOfOnes.next();
+				subtractRowFromOthers2(firstOneInCol, indicesOfOnes);
 			}
-//			System.out.println("found row : " + rowWithFirstOne);
-			if(rowWithFirstOne != -1){
-				for(int row = rowWithFirstOne - 1; row >= 0; row --){
-					if(getFreq(row, col) == 1){
-						additionalRowsWithAOne.add(row);
-					}
-				}
-//				System.out.println("sub " + rowWithFirstOne + " from  " + additionalRowsWithAOne);
-				subtractRowFromOthers(rowWithFirstOne, additionalRowsWithAOne);
-			}
-//			System.out.println("After col " + col + ", m == \n" + toString());
+
 		}
 	}
 
-	private void subtractRowFromOthers(int rowIndex, HashSet<Integer> otherRowIndices){
-		for(int colIndex = 0; colIndex < smoothNumbers.size(); colIndex ++){
-			if(getFreq(rowIndex, colIndex) == 1){ //if 0, subtraction has no effect
-				BigIntAndFactors col = smoothNumbers.get(colIndex);
+//	private void subtractRowFromOthers(int rowIndex, Iterator<BigInteger> otherRowIndices){
+//		for(int colIndex = 0; colIndex < columns.size(); colIndex ++){
+//			if(getFreq(rowIndex, colIndex) == 1){ //if 0, subtraction has no effect
+//				BigIntAndFactors col = columns.get(colIndex);
+//				BigIntAndFactors newCol = new BigIntAndFactors(col.getNumber());
+//				// BigIntAndFactors newCol = (BigIntAndFactors) col.clone();
+//				for(int otherIndex = 0; otherIndex < getNumRows(); otherIndex ++){
+//					if(otherRowIndices.contains(otherIndex)){
+//						if(col.getFactorFreq(otherIndex) == 0){
+//							newCol.addFactorWithIndex(otherIndex); //0 turned to 1
+//						}
+//					} else{
+//						if(col.getFactorFreq(otherIndex) == 1){
+//							newCol.addFactorWithIndex(otherIndex); //1 stayed a 1
+//						}
+//					}
+//				}
+//				columns.set(colIndex, newCol);
+//			}
+//		}
+//	}
+	
+	private void subtractRowFromOthers2(int rowIndex, Iterator<Integer> otherRowIndices){
+		while(otherRowIndices.hasNext()){
+			Integer otherRowIndex = otherRowIndices.next();
+			for(int colIndex = 0; colIndex < columns.size(); colIndex ++){
+				BigIntAndFactors col = columns.get(colIndex);
 				BigIntAndFactors newCol = new BigIntAndFactors(col.getNumber());
-				// BigIntAndFactors newCol = (BigIntAndFactors) col.clone();
-				for(int otherIndex = 0; otherIndex < getNumRows(); otherIndex ++){
-					if(otherRowIndices.contains(otherIndex)){
-						if(col.getFactorFreq(otherIndex) == 0){
-							newCol.addFactorWithIndex(otherIndex); //0 turned to 1
-						}
-					} else{
-						if(col.getFactorFreq(otherIndex) == 1){
-							newCol.addFactorWithIndex(otherIndex); //1 stayed a 1
-						}
+				if(getFreq(rowIndex, colIndex) == 1){ //if 0, subtraction has no effect
+					if(col.getFactorFreq(otherRowIndex) == 0){
+						newCol.addFactor(otherRowIndex); //0 turned to 1
 					}
+				} else{
+					if(col.getFactorFreq(otherRowIndex) == 1){
+						newCol.addFactor(otherRowIndex); //1 stayed a 1
+					}
+					columns.set(colIndex, newCol);
 				}
-				smoothNumbers.set(colIndex, newCol);
 			}
 		}
 	}
