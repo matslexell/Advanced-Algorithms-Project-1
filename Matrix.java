@@ -1,6 +1,4 @@
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -15,21 +13,19 @@ public class Matrix {
 		this.columns = smoothNumbers;
 	}
 	
-	
-	
-	public int getFreq(int row, int col) {
+	private int getFreq(int row, int col) {
 		return columns.get(col).getFactorFreq(row);
 	}
 
-	public int getNumCols() {
+	private int getNumCols() {
 		return columns.size();
 	}
 
-	public int getNumRows() {
-		return Quant.primes.size();
+	private int getNumRows() {
+		return QuadrSieve.primes.size();
 	}
 
-	public int[][] getMatrix() {
+	private int[][] getMatrix() {
 		int[][] matrix = new int[getNumRows()][getNumCols()];
 
 		for (int row = 0; row < matrix.length; row++) {
@@ -40,6 +36,11 @@ public class Matrix {
 
 		return matrix;
 	}
+	
+	public List<ArrayList<Integer>> gaussEliminateAndGetSolutions(){
+		gaussEliminate();
+		return getSomeNonTrivialSolutions();
+	}
 
 	public void gaussEliminate(){
 		gaussEliminateDown();		
@@ -47,9 +48,9 @@ public class Matrix {
 	}
 
 	private void gaussEliminateDown(){
+		System.out.println("Matrix dimensions: " + getNumRows() + " x " + getNumCols());
 		System.out.println("Gauss elimination (down)...");
-		System.out.println(getNumRows() + " x " + getNumCols());
-//		System.out.println("DOWN");
+		
 		HashSet<Integer> usedRows = new HashSet<Integer>();
 		for(int col = 0; col < getNumCols(); col ++){
 			BigIntAndFactors colVector = columns.get(col);
@@ -60,43 +61,12 @@ public class Matrix {
 				usedRows.add(firstOneInCol);
 				subtractRowFromOthers2(firstOneInCol, indicesOfOnes);
 			}
-			
-			
-			
-			
-//			for(int row = 0; row < getNumRows() ; row ++){
-//				if(usedRows.contains(row)){
-//					continue;
-//				}
-//				if(getFreq(row, col) == 1){
-//					rowWithFirstOne = row;
-//					usedRows.add(row);
-//					break;
-//				}
-//			}
-//			
-			
-//			
-//			
-////			System.out.println("found row : " + rowWithFirstOne);
-//			if(rowWithFirstOne != -1){
-//				for(int row = rowWithFirstOne + 1; row < getNumRows(); row ++){
-//					if(getFreq(row, col) == 1){
-//						additionalRowsWithAOne.add(row);
-//					}
-//				}
-////				System.out.println("sub " + rowWithFirstOne + " from  " + additionalRowsWithAOne);
-//				subtractRowFromOthers(rowWithFirstOne, additionalRowsWithAOne);
-//			}
-////			System.out.println("After col " + col + ", m == \n" + toString());
 		}
 	}
 
 	private void gaussEliminateUp(){
 		System.out.println("Gauss elimination (up)...");
-//		System.out.println("UP");
-		
-		
+
 		for(int col = getNumCols() - 1; col >= 0; col --){
 			BigIntAndFactors colVector = columns.get(col);
 			
@@ -109,28 +79,6 @@ public class Matrix {
 		}
 	}
 
-//	private void subtractRowFromOthers(int rowIndex, Iterator<BigInteger> otherRowIndices){
-//		for(int colIndex = 0; colIndex < columns.size(); colIndex ++){
-//			if(getFreq(rowIndex, colIndex) == 1){ //if 0, subtraction has no effect
-//				BigIntAndFactors col = columns.get(colIndex);
-//				BigIntAndFactors newCol = new BigIntAndFactors(col.getNumber());
-//				// BigIntAndFactors newCol = (BigIntAndFactors) col.clone();
-//				for(int otherIndex = 0; otherIndex < getNumRows(); otherIndex ++){
-//					if(otherRowIndices.contains(otherIndex)){
-//						if(col.getFactorFreq(otherIndex) == 0){
-//							newCol.addFactorWithIndex(otherIndex); //0 turned to 1
-//						}
-//					} else{
-//						if(col.getFactorFreq(otherIndex) == 1){
-//							newCol.addFactorWithIndex(otherIndex); //1 stayed a 1
-//						}
-//					}
-//				}
-//				columns.set(colIndex, newCol);
-//			}
-//		}
-//	}
-	
 	private void subtractRowFromOthers2(int rowIndex, Iterator<Integer> otherRowIndices){
 		while(otherRowIndices.hasNext()){
 			Integer otherRowIndex = otherRowIndices.next();
@@ -224,8 +172,6 @@ public class Matrix {
 			}
 		}
 	}
-	
-	
 	
 	private <K,V>void addToMapping(Map<K, ArrayList<V>> map, K key, V val){
 		if(map.containsKey(key)){

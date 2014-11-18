@@ -2,10 +2,9 @@ import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
 import java.util.TreeMap;
 
-class BigIntAndFactors implements Comparable{
+class BigIntAndFactors implements Comparable<BigIntAndFactors>{
 	private BigInteger b;
 	private TreeMap<Integer, Byte> map = new TreeMap<Integer, Byte>();
 
@@ -21,13 +20,11 @@ class BigIntAndFactors implements Comparable{
 		return b;
 	}
 
-	public boolean computeAndSetFactors(List<BigInteger> allowedFactors){
+	public boolean computeAndSetFactors(List<Long> allowedFactors){
 		BigInteger original = b;
 		for(int pInd = 0; pInd < allowedFactors.size(); pInd ++){
-//			System.out.print("-");
-			BigInteger factor = allowedFactors.get(pInd);
+			BigInteger factor = BigInteger.valueOf(allowedFactors.get(pInd));
 			while(isDivisible(factor)){
-//				System.out.println("^");
 				divideAndStoreFactor(factor, pInd);
 			}
 			if (isOne()) {
@@ -83,20 +80,12 @@ class BigIntAndFactors implements Comparable{
 	}
 
 	public String toString() {
-		return b.toString() + ": " + map.toString();
+		return "#" + b.toString() + ": " + map.toString() + "#";
 	}
 
 	@Override
-	public int compareTo(Object arg0) {
-		if(!(arg0 instanceof BigIntAndFactors)){
-			throw new IllegalArgumentException();
-		}
-		return getNumber().compareTo(((BigIntAndFactors)arg0).getNumber());
+	public int compareTo(BigIntAndFactors other) {
+		return getNumber().compareTo(other.getNumber());
 	}
-	
-//	@Override
-//	public int hashCode(){
-//		return b.hashCode(); 
-//	}
 
 }

@@ -1,6 +1,10 @@
-import java.math.*;
-import java.util.*;
-import java.util.function.*;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class Main {
 
@@ -8,40 +12,52 @@ public class Main {
 	}
 
 	public static void main(String[] args) throws FactorizationFailure{
-		BigInteger n = BigInteger.valueOf(8493618392L);
-//		n = n.multiply(BigInteger.valueOf(1957293013L));
-//		n = n.multiply(BigInteger.valueOf(3276510382L));
+//		BigInteger n = BigInteger.valueOf(179426549L);
+//		n = n.multiply(BigInteger.valueOf(179426491L));
+//		n = n.multiply(BigInteger.valueOf(179426453L));
 //		n = n.multiply(BigInteger.valueOf(1570882310L));
 //		n = n.multiply(BigInteger.valueOf(9987231111L));
-//		factorNumber(n);
+//		n = n.multiply(BigInteger.valueOf(1119502020L));
+//		testFactorN(n);
 		
-		ArrayList<BigInteger> factors = new ArrayList<BigInteger>();
-		factors.add(BigInteger.valueOf(7919));
-		factors.add(BigInteger.valueOf(7907));
-		factors.add(BigInteger.valueOf(5483));
-		factors.add(BigInteger.valueOf(3359));
-		factors.add(BigInteger.valueOf(7907));
-		factors.add(BigInteger.valueOf(5483));
-		factors.add(BigInteger.valueOf(3359));
-		factors.add(BigInteger.valueOf(2237));
-		factors.add(BigInteger.valueOf(271));
-		factors.add(BigInteger.valueOf(107));
-		factors.add(BigInteger.valueOf(3));
-		factors.add(BigInteger.valueOf(2));
+		Map<BigInteger, Integer> factors = new HashMap<BigInteger, Integer>();
+		factors.put(BigInteger.valueOf(179426549L), 2);
+		factors.put(BigInteger.valueOf(179426231L), 1);
+		factors.put(BigInteger.valueOf(2237), 1);
+		factors.put(BigInteger.valueOf(3), 4);
 		testFactorProductOf(factors);
 		
 		
 	}
 	
-	private static void testFactorProductOf(List<BigInteger> primeFactors){
-		BigInteger n = BigInteger.ONE;
-		for(BigInteger f: primeFactors){
-			n = n.multiply(f);
+	private static boolean validateFactors(Map<BigInteger, Integer> factors, BigInteger product){
+		BigInteger accumulated = BigInteger.ONE;
+		for(Entry<BigInteger,Integer> entry : factors.entrySet()){
+			for(int i = 0; i < entry.getValue(); i++){
+				accumulated = accumulated.multiply(entry.getKey());
+			}
 		}
-		List<BigInteger> resultFactors = factorNumber(n);
+		return accumulated.equals(product);
+	}
+	
+	private static void testFactorN(BigInteger n){
+		Map<BigInteger,Integer> factors = getPrimeFactors(n);
+		System.out.println("factors: " + getPrimeFactors(n));
+		System.out.println("CORRECT: " + validateFactors(factors, n));
+	}
+	
+	private static void testFactorProductOf(Map<BigInteger, Integer> primeFactors){
+		BigInteger n = BigInteger.ONE;
+		for(BigInteger f: primeFactors.keySet()){
+			for(int i = 0; i < primeFactors.get(f); i++){
+				n = n.multiply(f);
+			}
+		}
+//		List<BigInteger> resultFactors = factorNumber(n);
+		Map<BigInteger, Integer> resultFactors = getPrimeFactors(n);
 		System.out.println("factors: " + primeFactors);
 		System.out.println("result: " + resultFactors);
-		boolean correct = new HashSet(primeFactors).equals(new HashSet(resultFactors));
+		boolean correct =primeFactors.equals(resultFactors);
 		if(correct){
 			System.out.println("CORRECT!");
 		}else{
@@ -51,49 +67,50 @@ public class Main {
 
 
 
-	public BigInteger getFactor(BigInteger n) throws FactorizationFailure{
+	public static BigInteger getFactor(BigInteger n) throws FactorizationFailure{
+		BigInteger smallerFactor;
 		
-		if(n.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) <= 0){
-			naiveGetFactor(n);
+		if(n.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) <= 0){
+			System.out.println("naiveGetFactor(" + n + ")");
+			smallerFactor = Naive.naiveGetFactor(n);
+			System.out.println("FOUND: " + smallerFactor);
+			return smallerFactor;
 		}
-		return pollardRho(n);
-	}
-
-	public BigInteger naiveGetFactor(BigInteger n) throws FactorizationFailure{
-		double log = Math.log(n.doubleValue());
-		BigInteger max = BigInteger.valueOf((long) Math.pow(Math.E, Math.ceil(log/2)));
-		if(max.compareTo(n) >= 0){
-			max = n.subtract(BigInteger.ONE);
-		}
-		// System.out.println("Small n: " + n);
-		for(BigInteger f = BigInteger.valueOf(2); f.compareTo(max) <= 0; f = f.add(BigInteger.ONE)){
-			if(n.divideAndRemainder(f)[1].equals(BigInteger.ZERO)){
-				return f;
+//		return PollardRho.pollardRho(n);
+		
+		
+		
+		
+		PollardRho.G g = new PollardRho.G(n, BigInteger.valueOf(2));
+		try {
+			System.out.println("pollardRhoInner(" + n + ")");
+			smallerFactor = PollardRho.pollardRhoInner(n, BigInteger.valueOf(2), x -> g.g(x));
+		} catch (FactorizationFailure e) {
+			System.out.println("pollardRho failed");
+			try {
+				System.out.println("QuadrSieve(" + n + ")");
+				smallerFactor = QuadrSieve.getFactor(n);
+			} catch (FactorizationFailure e1) {
+				throw new FactorizationFailure("cant' factor " + n );
 			}
 		}
-		throw new FactorizationFailure(n + " is prime.");
+		System.out.println("FOUND: " + smallerFactor);
+		return smallerFactor;
 	}
 
-	/**
-	* Return the greatest common divisor of two numbers.
-	* For instance gcd(42, 12) == 6
-	*/
-	public static BigInteger gcd(BigInteger a, BigInteger b){
-		BigInteger t;
-		while(b != BigInteger.ZERO){
-			t = b;
-			b = a.mod(b);
-			a = t;
-		}
-		return a;
-	}
+	
+
+	
 
 	/** 
 	* Return the prime factors of given number.
 	* Factors are returned in a map with factors as keys and the factor-powers as values.
 	* For instance getPrimeFactors(12) == {2:2, 3:1} since 12 = 2^2 * 3^1
 	*/
-	public Map<BigInteger, Integer> getPrimeFactors(BigInteger n){
+	public static Map<BigInteger, Integer> getPrimeFactors(BigInteger n){
+		System.out.println("\n-----------------------");
+		System.out.println("getPrimeFactors(" + n + ")");
+		System.out.println("-----------------------\n");
 		Map<BigInteger, Integer> primeFactors = new HashMap<BigInteger, Integer>();
 		BigInteger factor;
 		BigInteger smallerFactor;
@@ -107,16 +124,17 @@ public class Main {
 				factors.add(smallerFactor);
 				factors.add(factor.divide(smallerFactor));
 			}catch(FactorizationFailure e){
-				// System.out.println("it's prime");
+				System.out.println("PRIME: " + factor);
 				increment(primeFactors, factor);
 			}
 		}
 		return primeFactors;
 	}
+	
 
 	// Increment value of given key in the map with one. 
 	// Add key first if it's not present.
-	private <E> void increment(Map<E, Integer> map, E key){
+	private static <E> void increment(Map<E, Integer> map, E key){
 		if(map.containsKey(key)){
 			map.put(key, map.get(key) + 1);
 		}else{
@@ -125,129 +143,34 @@ public class Main {
 	}
 
 
-	/**
-	* Return a non-trivial factor of given number, or throw
-	* an exception if none can be found.
-	* For instance pollardRho(1002) == 3
-	*/
-	public static BigInteger pollardRho(BigInteger n) throws FactorizationFailure{
-		FactorizationFailure exception = null;
+	
+	public static void testGauss(){
+		ArrayList<BigIntAndFactors> cols = new ArrayList<BigIntAndFactors>();
+
+		List<Long> primes = Naive.getPrimesLessThan(20);
+
+		cols.add(new BigIntAndFactors(BigInteger.valueOf(2)));
+		cols.get(0).computeAndSetFactors(primes);
+
+		cols.add(new BigIntAndFactors(BigInteger.valueOf(2)));
+		cols.get(1).computeAndSetFactors(primes);
+
+		cols.add(new BigIntAndFactors(BigInteger.valueOf(3)));
+		cols.get(2).computeAndSetFactors(primes);
 		
-		for(BigInteger addInG = BigInteger.ONE; addInG.compareTo(n) <= 0; addInG = addInG.add(BigInteger.ONE)){
-			// System.out.println("add: " + addInG);
-			for(BigInteger startValue = BigInteger.valueOf(2); startValue.compareTo(n.add(BigInteger.ONE)) <= 0; startValue = startValue.add(BigInteger.ONE)){
-				try{
-					G g = new G(n, addInG);
-					BigInteger answer = pollardRhoInner(n, startValue, x -> g.g(x));
-					return answer;
-				}catch(FactorizationFailure e){ 
-					exception = e;
-				}
-			}
-		}
-		throw exception;
-	}
+		cols.add(new BigIntAndFactors(BigInteger.valueOf(6)));
+		cols.get(3).computeAndSetFactors(primes);
 
-	//Try to return a non-trivial factor of given number.
-	private static BigInteger pollardRhoInner(BigInteger n, BigInteger startValue, UnaryOperator<BigInteger> g) throws FactorizationFailure{
+		Matrix m = new Matrix(cols);
+		System.out.println(m);
+		m.gaussEliminate();
+		System.out.println("\n" + m);
 		
-		//TODO My guess is that the chosen g() doesn't like the number 4.
-		if(n.intValue() == 4){
-			return BigInteger.valueOf(2);
-		}
-
-		BigInteger x = startValue;
-		BigInteger y = startValue;
-		BigInteger d = BigInteger.ONE;
-		while(d.equals(BigInteger.ONE)){
-			x = g.apply(x);
-			y = g.apply(g.apply(y));
-			d = gcd(x.subtract(y).abs(), n);
-			// System.out.println(x + ", " + y + ", " + d);
-		}
-		if(d.equals(n)){
-			throw new FactorizationFailure("Failed to factorize " + n + ". (x:" + x + ", y:" + y + ", d:" + d + ")");
-		}
-		return d;
-	}
-
-	private static class G{
-		private BigInteger n;
-		private BigInteger toAdd;
-
-		G(BigInteger n, BigInteger toAdd){
-			this.n = n;
-			this.toAdd = toAdd;
-		}
-
-		BigInteger g(BigInteger x){
-			return x.pow(2).add(toAdd).mod(n);
+		List<ArrayList<Integer>> solutions = m.getSomeNonTrivialSolutions();
+		for(ArrayList<Integer> solution : solutions) {
+			System.out.println("Product of " + Arrays.toString(solution.stream().mapToInt(i -> cols.get(i).getNumber().intValue()).toArray()) + " is a square");
 		}
 	}
-
-	//Implements Sieve of Eratosthenes
-	public List<Long> getPrimesLessThan(long max){
-		HashSet<Long> composites = new HashSet<Long>();
-		List<Long> primes = new ArrayList<Long>();
-		for(long i = 2; i < max; i++){
-			if(! composites.contains(i)){
-				long prime = i;
-				primes.add(prime);
-				for(long comp = prime * 2; comp < max; comp += prime){
-					composites.add(comp);
-				}
-			}
-		}
-		return primes;
-	}
-	
-	
-	
-	public static List<BigInteger> factorNumber(BigInteger n){
-		
-		System.out.println("Factor n = " + n);
-			
-		List<BigInteger> factors = new ArrayList<BigInteger>();
-		factors.add(n);
-		G g = new G(n, BigInteger.valueOf(2));
-		BigInteger pollardRhoStartValue = BigInteger.valueOf(2);
-		List<BigInteger> primes = new ArrayList<BigInteger>();
-		while(!factors.isEmpty()){
-			BigInteger factor = factors.remove(0);
-			if(Quant.primes.contains(factor)){
-				primes.add(factor);
-				continue;
-			}
-			BigInteger smallerFactor;
-			try {
-				System.out.println("pollardRhoInner(" + factor + ")");
-				smallerFactor = pollardRhoInner(factor, pollardRhoStartValue, x -> g.g(x));
-			} catch (FactorizationFailure e) {
-				System.out.println("pollardRho failed");
-				try {
-					smallerFactor = Quant.getFactor(factor);
-				} catch (FactorizationFailure e1) {
-					primes.add(factor);
-					continue;
-				}
-			}
-			factors.add(smallerFactor);
-			factors.add(factor.divide(smallerFactor));
-			System.out.println("after adding, factors: " + factors);
-		}
-		
-		System.out.println("factors: " + factors);
-		System.out.println("prime factors: " + primes);
-		return primes;
-	}
-
-	
-	
-	
-	
-	
-	
-	
 	
 	
 	
