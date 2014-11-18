@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.TreeMap;
+import java.util.Map.Entry;
 import java.util.stream.Stream;
 
 
@@ -14,7 +16,7 @@ public class Quant {
 	 * This class performs the quantic seive algortihm
 	 */
 
-	public static final long SMOOTHNESS = 15 * 1000;
+	public static final long SMOOTHNESS = 5 * 1000;
 	public final static ArrayList<BigInteger> primes = getPrimesLessThan(SMOOTHNESS + 1);
 
 	/**
@@ -23,19 +25,20 @@ public class Quant {
 	 * 
 	 * @param n
 	 * @param amount
-	 * @return
+	 * @return map from p to a (p == a^2 - N)
 	 */
-	public static HashMap<BigInteger, BigInteger> genPVals(BigInteger n, int amount) {
+	public static TreeMap<BigInteger, BigInteger> genPVals(BigInteger n, int amount) {
 		System.out.println("generating p-values...");
 		BigInteger a0 = biggerThanSqrt(n);
 //		System.out.println("first a: " + a0);
-		HashMap<BigInteger, BigInteger> pVals = new HashMap<BigInteger, BigInteger>();
+		TreeMap<BigInteger, BigInteger> pVals = new TreeMap<BigInteger, BigInteger>();
 		
 		for (int i = 0; i < amount; i++) {
 			BigInteger a = a0.add(BigInteger.valueOf(i));
 			BigInteger p = a.pow(2).subtract(n);
-			assert(p.compareTo(BigInteger.ZERO) > 0);
-			pVals.put(p, a);
+			if(p.compareTo(BigInteger.ZERO) > 0){
+				pVals.put(p, a);
+			}
 		}
 
 		return pVals;
@@ -70,15 +73,16 @@ public class Quant {
 		return primes;
 	}
 
-	public static HashMap<BigIntAndFactors, BigInteger> smoothing(
-			HashMap<BigInteger, BigInteger> pVals) {
+	public static TreeMap<BigIntAndFactors, BigInteger> smoothing(
+			TreeMap<BigInteger, BigInteger> pVals) {
 		System.out.println("Smoothing...");
 		ArrayList<BigIntAndFactors> nonSmooth = copy(pVals.keySet());
-		ArrayList<BigInteger> primes = getPrimesLessThan(SMOOTHNESS + 1);
-		HashMap<BigIntAndFactors, BigInteger> smooth = new HashMap<BigIntAndFactors, BigInteger>();
+		TreeMap<BigIntAndFactors, BigInteger> smooth = new TreeMap<BigIntAndFactors, BigInteger>();
 
 		for (int j = 0; j < nonSmooth.size(); j++) {
+			
 			BigIntAndFactors b = nonSmooth.get(j);
+			System.out.print("check if " + b + " is smooth");
 			boolean isSmooth = b.computeAndSetFactors(primes);
 			if(isSmooth){
 				smooth.put(b, pVals.get(b.getNumber()));
@@ -91,7 +95,7 @@ public class Quant {
 	
 	//not correct
 	public static HashMap<BigIntAndFactors, BigInteger> smoothing2(
-			HashMap<BigInteger, BigInteger> pVals) {
+			TreeMap<BigInteger, BigInteger> pVals) {
 		BigInteger biggestPVal = pVals.keySet().stream().max(BigInteger::compareTo).get();
 		System.out.println("biggest p : " + biggestPVal);
 		HashMap<BigInteger, BigIntAndFactors> composites = new HashMap<BigInteger, BigIntAndFactors>();
@@ -119,6 +123,81 @@ public class Quant {
 		
 		return smoothValues;
 	}
+	
+	
+	public static TreeMap<BigIntAndFactors, BigInteger> smoothing3(
+			TreeMap<BigInteger, BigInteger> pVals) {
+		
+		TreeMap<BigInteger, BigIntAndFactors> pDivisions = new TreeMap<BigInteger, BigIntAndFactors>();
+		
+		BigInteger firstP = pVals.firstKey();
+		System.out.println(pVals);
+		
+		for(int primeIndex = 0; primeIndex < primes.size(); primeIndex ++){
+			
+			BigInteger prime = primes.get(primeIndex);
+			
+			if(primeIndex % 1 == 0){
+				System.out.println("prime " + prime);
+			}
+			
+			BigInteger[] divResult = firstP.divideAndRemainder(prime);
+			BigInteger firstDivisibleP = null;
+			if(divResult[1].equals(BigInteger.ZERO)){
+				firstDivisibleP = firstP;
+				System.out.println("firstP =" + firstP);
+				
+			}else{
+				firstDivisibleP = divResult[0].add(BigInteger.ONE).multiply(firstP);
+			}
+			for(BigInteger maybeP = firstDivisibleP; maybeP.compareTo(pVals.lastKey()) <= 0; maybeP = maybeP.add(prime)){
+				if(pVals.containsKey(maybeP)){
+					divideWhileDivisible(pDivisions, maybeP, prime, primeIndex);
+				}
+			}
+		}
+		
+		TreeMap<BigIntAndFactors, BigInteger> smoothPVals = new TreeMap<BigIntAndFactors, BigInteger>();
+		
+		for(Entry<BigInteger, BigIntAndFactors> pDivEntry : pDivisions.entrySet()){
+			BigInteger originalNumber = pDivEntry.getKey();
+			BigIntAndFactors dividedNumberWithFactors = pDivEntry.getValue();
+			if(dividedNumberWithFactors.isOne()){
+				dividedNumberWithFactors.setNumber(originalNumber);
+				BigInteger a = pVals.get(originalNumber);
+				smoothPVals.put(dividedNumberWithFactors, a);
+			}
+		}
+		
+		return smoothPVals;
+		
+	}
+	
+	/**
+	 * 
+	 * @param divisions map from x to y(<=x) where y is the result of dividing x by primes.
+	 * @param originalNumber x
+	 * @param prime the prime to divide x with this time.
+	 */
+	private static void divideWhileDivisible(TreeMap<BigInteger, BigIntAndFactors> divisions, BigInteger originalNumber, BigInteger prime, int primeIndex){
+		if(!divisions.containsKey(originalNumber)){
+			divisions.put(originalNumber, new BigIntAndFactors(originalNumber));
+		}
+		while(divisions.get(originalNumber).isDivisible(prime)){
+			divisions.get(originalNumber).divideAndStoreFactor(prime, primeIndex);
+		}
+	}
+	
+	
+	
+	/**
+	 * Solve x^2 === n (mod p)
+	 * @param p 
+	 * @param n
+	 */
+//	public BigInteger solveQuadrCongruence(BigInteger p, BigInteger n){
+//		throw new OperationNotSupportedException();
+//	}
 	
 	
 	
@@ -162,10 +241,9 @@ public class Quant {
 	
 	public static BigInteger getFactor(BigInteger n) throws FactorizationFailure{
 		System.out.println("We wanna factor n = " + n);
-		HashMap<BigInteger, BigInteger> pVals = Quant.genPVals(n, 10 * 1000);
-		
-		System.out.println(pVals.size() + " p-values: ");// + pVals);
-		HashMap<BigIntAndFactors, BigInteger> smoothPVals = smoothing2(pVals);
+		TreeMap<BigInteger, BigInteger> pVals = Quant.genPVals(n, 1 * 100);
+		System.out.println(pVals.size() + " p-values: " + pVals);
+		TreeMap<BigIntAndFactors, BigInteger> smoothPVals = smoothing(pVals);
 		System.out.println(smoothPVals.size() + " smooth numbers: ");// + smoothPVals);
 		List<BigIntAndFactors> columns = Arrays.asList(smoothPVals.keySet().toArray(new BigIntAndFactors[]{})); 
 		Matrix m = new Matrix(columns);
@@ -208,19 +286,6 @@ public class Quant {
 		}
 		throw new FactorizationFailure("Couldn't factor " + n);
 		
-	}
-
-	public static void main(String[] args) throws FactorizationFailure {
-		BigInteger n = BigInteger.valueOf(8493618392L);
-//		n = n.multiply(BigInteger.valueOf(1957293013L));
-//		n = n.multiply(BigInteger.valueOf(3276510382L));
-//		n = n.multiply(BigInteger.valueOf(1570882310L));
-//		n = n.multiply(BigInteger.valueOf(9987231111L));
-		BigInteger factor = getFactor(n);
-		System.out.println("factor = " + factor);
-		BigInteger[] divRes = n.divideAndRemainder(factor);
-		System.out.println(n + "  /  " + factor + "  ==  " + divRes[0] + " with remainder " + divRes[1]);
-		assert(divRes[1].equals(BigInteger.ZERO));
 	}
 	
 

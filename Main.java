@@ -8,10 +8,30 @@ public class Main {
 	}
 
 	public static void main(String[] args) throws FactorizationFailure{
-		Test.test();
+		BigInteger n = BigInteger.valueOf(8493618392L);
+		n = n.multiply(BigInteger.valueOf(1957293013L));
+		n = n.multiply(BigInteger.valueOf(3276510382L));
+		n = n.multiply(BigInteger.valueOf(1570882310L));
+		n = n.multiply(BigInteger.valueOf(9987231111L));
+		
+		
+		
+//		n = BigInteger.valueOf(7919).
+//				multiply(BigInteger.valueOf(7907)).
+//				multiply(BigInteger.valueOf(5483)).
+//				multiply(BigInteger.valueOf(3359)).
+//				multiply(BigInteger.valueOf(7907)).
+//				multiply(BigInteger.valueOf(5483)).
+//				multiply(BigInteger.valueOf(3359));
+		
+		
+		
+		factorNumber(n);
+		
+		
 	}
 
-	
+
 
 	public BigInteger getFactor(BigInteger n) throws FactorizationFailure{
 		
@@ -92,8 +112,9 @@ public class Main {
 	* an exception if none can be found.
 	* For instance pollardRho(1002) == 3
 	*/
-	public BigInteger pollardRho(BigInteger n) throws FactorizationFailure{
+	public static BigInteger pollardRho(BigInteger n) throws FactorizationFailure{
 		FactorizationFailure exception = null;
+		
 		for(BigInteger addInG = BigInteger.ONE; addInG.compareTo(n) <= 0; addInG = addInG.add(BigInteger.ONE)){
 			// System.out.println("add: " + addInG);
 			for(BigInteger startValue = BigInteger.valueOf(2); startValue.compareTo(n.add(BigInteger.ONE)) <= 0; startValue = startValue.add(BigInteger.ONE)){
@@ -110,7 +131,7 @@ public class Main {
 	}
 
 	//Try to return a non-trivial factor of given number.
-	private BigInteger pollardRhoInner(BigInteger n, BigInteger startValue, UnaryOperator<BigInteger> g) throws FactorizationFailure{
+	private static BigInteger pollardRhoInner(BigInteger n, BigInteger startValue, UnaryOperator<BigInteger> g) throws FactorizationFailure{
 		
 		//TODO My guess is that the chosen g() doesn't like the number 4.
 		if(n.intValue() == 4){
@@ -132,7 +153,7 @@ public class Main {
 		return d;
 	}
 
-	private class G{
+	private static class G{
 		private BigInteger n;
 		private BigInteger toAdd;
 
@@ -161,5 +182,61 @@ public class Main {
 		}
 		return primes;
 	}
+	
+	
+	
+	public static List<BigInteger> factorNumber(BigInteger n){
+		
+		System.out.println("Factor n = " + n);
+			
+		List<BigInteger> factors = new ArrayList<BigInteger>();
+		factors.add(n);
+		G g = new G(n, BigInteger.valueOf(2));
+		BigInteger pollardRhoStartValue = BigInteger.valueOf(2);
+		List<BigInteger> primes = new ArrayList<BigInteger>();
+		while(!factors.isEmpty()){
+			BigInteger factor = factors.remove(0);
+			if(Quant.primes.contains(factor)){
+				primes.add(factor);
+				continue;
+			}
+			BigInteger smallerFactor;
+			try {
+				System.out.println("pollardRhoInner(" + factor + ")");
+				smallerFactor = pollardRhoInner(factor, pollardRhoStartValue, x -> g.g(x));
+			} catch (FactorizationFailure e) {
+				System.out.println("pollardRho failed");
+				try {
+					smallerFactor = Quant.getFactor(factor);
+				} catch (FactorizationFailure e1) {
+					primes.add(factor);
+					continue;
+				}
+			}
+			factors.add(smallerFactor);
+			factors.add(factor.divide(smallerFactor));
+			System.out.println("after adding, factors: " + factors);
+		}
+		
+		System.out.println("factors: " + factors);
+		System.out.println("prime factors: " + primes);
+		return primes;
+	}
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

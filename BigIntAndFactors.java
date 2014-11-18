@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-class BigIntAndFactors {
+class BigIntAndFactors implements Comparable{
 	private BigInteger b;
 	private TreeMap<Integer, Byte> map = new TreeMap<Integer, Byte>();
 
@@ -13,7 +13,7 @@ class BigIntAndFactors {
 		this.b = b;
 	}
 	
-	private void setNumber(BigInteger p){
+	public void setNumber(BigInteger p){
 		b = p;
 	}
 	
@@ -24,8 +24,10 @@ class BigIntAndFactors {
 	public boolean computeAndSetFactors(List<BigInteger> allowedFactors){
 		BigInteger original = b;
 		for(int pInd = 0; pInd < allowedFactors.size(); pInd ++){
+//			System.out.print("-");
 			BigInteger factor = allowedFactors.get(pInd);
 			while(isDivisible(factor)){
+//				System.out.println("^");
 				divideAndStoreFactor(factor, pInd);
 			}
 			if (isOne()) {
@@ -82,6 +84,14 @@ class BigIntAndFactors {
 
 	public String toString() {
 		return b.toString() + ": " + map.toString();
+	}
+
+	@Override
+	public int compareTo(Object arg0) {
+		if(!(arg0 instanceof BigIntAndFactors)){
+			throw new IllegalArgumentException();
+		}
+		return getNumber().compareTo(((BigIntAndFactors)arg0).getNumber());
 	}
 	
 //	@Override
