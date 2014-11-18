@@ -4,7 +4,7 @@ import java.util.ArrayList;
 public class NGenerator {
 
 	final static long mats = 8811091712L;
-	final static long jonathan = 9001011234L;
+	final static long jonathan = 9008081532L;
 	final static long j = 0;
 
 	public NGenerator() {
