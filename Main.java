@@ -9,26 +9,44 @@ public class Main {
 
 	public static void main(String[] args) throws FactorizationFailure{
 		BigInteger n = BigInteger.valueOf(8493618392L);
-		n = n.multiply(BigInteger.valueOf(1957293013L));
-		n = n.multiply(BigInteger.valueOf(3276510382L));
-		n = n.multiply(BigInteger.valueOf(1570882310L));
-		n = n.multiply(BigInteger.valueOf(9987231111L));
+//		n = n.multiply(BigInteger.valueOf(1957293013L));
+//		n = n.multiply(BigInteger.valueOf(3276510382L));
+//		n = n.multiply(BigInteger.valueOf(1570882310L));
+//		n = n.multiply(BigInteger.valueOf(9987231111L));
+//		factorNumber(n);
+		
+		ArrayList<BigInteger> factors = new ArrayList<BigInteger>();
+		factors.add(BigInteger.valueOf(7919));
+		factors.add(BigInteger.valueOf(7907));
+		factors.add(BigInteger.valueOf(5483));
+		factors.add(BigInteger.valueOf(3359));
+		factors.add(BigInteger.valueOf(7907));
+		factors.add(BigInteger.valueOf(5483));
+		factors.add(BigInteger.valueOf(3359));
+		factors.add(BigInteger.valueOf(2237));
+		factors.add(BigInteger.valueOf(271));
+		factors.add(BigInteger.valueOf(107));
+		factors.add(BigInteger.valueOf(3));
+		factors.add(BigInteger.valueOf(2));
+		testFactorProductOf(factors);
 		
 		
-		
-//		n = BigInteger.valueOf(7919).
-//				multiply(BigInteger.valueOf(7907)).
-//				multiply(BigInteger.valueOf(5483)).
-//				multiply(BigInteger.valueOf(3359)).
-//				multiply(BigInteger.valueOf(7907)).
-//				multiply(BigInteger.valueOf(5483)).
-//				multiply(BigInteger.valueOf(3359));
-		
-		
-		
-		factorNumber(n);
-		
-		
+	}
+	
+	private static void testFactorProductOf(List<BigInteger> primeFactors){
+		BigInteger n = BigInteger.ONE;
+		for(BigInteger f: primeFactors){
+			n = n.multiply(f);
+		}
+		List<BigInteger> resultFactors = factorNumber(n);
+		System.out.println("factors: " + primeFactors);
+		System.out.println("result: " + resultFactors);
+		boolean correct = new HashSet(primeFactors).equals(new HashSet(resultFactors));
+		if(correct){
+			System.out.println("CORRECT!");
+		}else{
+			System.out.println("WRONG!");
+		}
 	}
 
 

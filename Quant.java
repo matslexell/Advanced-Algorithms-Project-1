@@ -16,7 +16,7 @@ public class Quant {
 	 * This class performs the quantic seive algortihm
 	 */
 
-	public static final long SMOOTHNESS = 5 * 1000;
+	public static final long SMOOTHNESS = 500 * 1000;
 	public final static ArrayList<BigInteger> primes = getPrimesLessThan(SMOOTHNESS + 1);
 
 	/**
@@ -82,7 +82,7 @@ public class Quant {
 		for (int j = 0; j < nonSmooth.size(); j++) {
 			
 			BigIntAndFactors b = nonSmooth.get(j);
-			System.out.print("check if " + b + " is smooth");
+//			System.out.print("check if " + b + " is smooth");
 			boolean isSmooth = b.computeAndSetFactors(primes);
 			if(isSmooth){
 				smooth.put(b, pVals.get(b.getNumber()));
@@ -241,8 +241,8 @@ public class Quant {
 	
 	public static BigInteger getFactor(BigInteger n) throws FactorizationFailure{
 		System.out.println("We wanna factor n = " + n);
-		TreeMap<BigInteger, BigInteger> pVals = Quant.genPVals(n, 1 * 100);
-		System.out.println(pVals.size() + " p-values: " + pVals);
+		TreeMap<BigInteger, BigInteger> pVals = Quant.genPVals(n, 20 * 1000);
+		System.out.println(pVals.size() + " p-values: ");// + pVals);
 		TreeMap<BigIntAndFactors, BigInteger> smoothPVals = smoothing(pVals);
 		System.out.println(smoothPVals.size() + " smooth numbers: ");// + smoothPVals);
 		List<BigIntAndFactors> columns = Arrays.asList(smoothPVals.keySet().toArray(new BigIntAndFactors[]{})); 
@@ -251,8 +251,9 @@ public class Quant {
 //		System.out.println(m.toString());
 		List<ArrayList<Integer>> solutions = m.getSomeNonTrivialSolutions();
 		System.out.println("num solutions: " + solutions.size());
-		for(ArrayList<Integer> solution : solutions){
-			System.out.println("\nsolution: " + solution);
+		for(int solIndex = 0; solIndex < solutions.size(); solIndex++){
+			ArrayList<Integer> solution = solutions.get(solIndex);
+			System.out.println("\nsolution" + solIndex + ": " + solution);
 			Stream<BigInteger> chosenNumbers = solution.stream().map(i -> columns.get(i).getNumber());
 			
 //			System.out.println("Product of " + Arrays.toString(chosenNumbers.toArray()) + " is a square");
