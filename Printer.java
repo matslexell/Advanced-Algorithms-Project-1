@@ -1,13 +1,35 @@
-public class Printer {
-	private static final boolean verbose = true;
+import java.util.HashMap;
+import java.util.Map;
 
-	public static void print(String s) {
-		if (verbose)
-			System.out.print(s);
+public enum Printer {
+		MAIN("MAIN"),
+		MATRIX("MATRIX"),
+		NAIVE("NAIVE"),
+		POLLARD_RHO("POLLARD_RHO"),
+		QUADR_SIEVE("QUADR_SIEVE");
+		
+		
+	String printerType;
+	Printer(String type){
+		this.printerType = type;
+	}
+	
+	private static final Map<String, Boolean> VERBOSE = new HashMap<String, Boolean>();
+	static{
+		VERBOSE.put("MAIN", true);
+		VERBOSE.put("MATRIX", false);
+		VERBOSE.put("NAIVE", false);
+		VERBOSE.put("POLLARD_RHO", true);
+		VERBOSE.put("QUADR_SIEVE", true);
 	}
 
-	public static void println(String s) {
-		if (verbose)
-			print(s + "\n");
+	public void print(Object msg) {
+		if (VERBOSE.get(printerType))
+			System.out.print(msg);
+	}
+
+	public void println(Object msg) {
+		if (VERBOSE.get(printerType))
+			System.out.println(msg);
 	}
 }
