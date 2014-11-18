@@ -48,8 +48,8 @@ public class Matrix {
 	}
 
 	private void gaussEliminateDown(){
-		System.out.println("Matrix dimensions: " + getNumRows() + " x " + getNumCols());
-		System.out.println("Gauss elimination (down)...");
+		Printer.MATRIX.print("Matrix dimensions: " + getNumRows() + " x " + getNumCols());
+		Printer.MATRIX.print("Gauss elimination (down)...");
 		
 		HashSet<Integer> usedRows = new HashSet<Integer>();
 		for(int col = 0; col < getNumCols(); col ++){
@@ -65,7 +65,7 @@ public class Matrix {
 	}
 
 	private void gaussEliminateUp(){
-		System.out.println("Gauss elimination (up)...");
+		Printer.MATRIX.print("Gauss elimination (up)...");
 
 		for(int col = getNumCols() - 1; col >= 0; col --){
 			BigIntAndFactors colVector = columns.get(col);
@@ -105,14 +105,14 @@ public class Matrix {
 	 * @return
 	 */
 	public List<ArrayList<Integer>> getSomeNonTrivialSolutions(){
-		System.out.println("Extracting solutions from reduced matrix...");
+		Printer.MATRIX.print("Extracting solutions from reduced matrix...");
 		HashSet<Integer> lockedZeros = new HashSet<Integer>();
 		HashMap<Integer, ArrayList<Integer>> equalToSum = new HashMap<Integer, ArrayList<Integer>>();
 		HashSet<Integer> unbound = new HashSet<Integer>();
 		getHintsAboutMatrixSolution(lockedZeros, equalToSum, unbound);
-//		System.out.println("lockedZero: " + lockedZeros);
-//		System.out.println("constraints: " + equalToSum);
-//		System.out.println("unbound: " + unbound);
+//		Printer.MATRIX.print("lockedZero: " + lockedZeros);
+//		Printer.MATRIX.print("constraints: " + equalToSum);
+//		Printer.MATRIX.print("unbound: " + unbound);
 		List<ArrayList<Integer>> solutions = new ArrayList<ArrayList<Integer>>();
 		
 		//There is a critical assumption here.
@@ -127,7 +127,7 @@ public class Matrix {
 			for(int constrained : equalToSum.keySet()){
 				int sum = equalToSum.get(constrained).stream().mapToInt(x -> solution.contains(x)? 1 : 0).sum();
 				if(sum % 2 == 1){
-//					System.out.println("add " + constrained + " since sum(" + equalToSum.get(constrained) + ") == " + sum);
+//					Printer.MATRIX.print("add " + constrained + " since sum(" + equalToSum.get(constrained) + ") == " + sum);
 					solution.add(constrained);
 				}
 			}

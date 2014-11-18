@@ -13,7 +13,7 @@ public class PollardRho {
 		FactorizationFailure exception = null;
 		
 		for(BigInteger addInG = BigInteger.ONE; addInG.compareTo(n) <= 0; addInG = addInG.add(BigInteger.ONE)){
-			// System.out.println("add: " + addInG);
+			// Printer.POLLARD.print("add: " + addInG);
 			for(BigInteger startValue = BigInteger.valueOf(2); startValue.compareTo(n.add(BigInteger.ONE)) <= 0; startValue = startValue.add(BigInteger.ONE)){
 				try{
 					G g = new G(n, addInG);
@@ -38,11 +38,16 @@ public class PollardRho {
 		BigInteger x = startValue;
 		BigInteger y = startValue;
 		BigInteger d = BigInteger.ONE;
+		int i = 0; 
 		while(d.equals(BigInteger.ONE)){
+			i ++;
+			if(i % 10000 == 0){
+				Printer.POLLARD_RHO.print(i);
+			}
 			x = g.apply(x);
 			y = g.apply(g.apply(y));
 			d = Naive.gcd(x.subtract(y).abs(), n);
-			// System.out.println(x + ", " + y + ", " + d);
+			// Printer.POLLARD.print(x + ", " + y + ", " + d);
 		}
 		if(d.equals(n)){
 			throw new FactorizationFailure("Failed to factorize " + n + ". (x:" + x + ", y:" + y + ", d:" + d + ")");

@@ -7,27 +7,43 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public class Main {
-
+	
 	public Main() {	
 	}
 
 	public static void main(String[] args) throws FactorizationFailure{
-//		BigInteger n = BigInteger.valueOf(179426549L);
-//		n = n.multiply(BigInteger.valueOf(179426491L));
-//		n = n.multiply(BigInteger.valueOf(179426453L));
-//		n = n.multiply(BigInteger.valueOf(1570882310L));
-//		n = n.multiply(BigInteger.valueOf(9987231111L));
-//		n = n.multiply(BigInteger.valueOf(1119502020L));
-//		testFactorN(n);
-		
+		project1(9008081532L);
+	}
+	
+	private static void test1(){
+		BigInteger n = BigInteger.valueOf(179426549L);
+		n = n.multiply(BigInteger.valueOf(179426491L));
+		n = n.multiply(BigInteger.valueOf(179426453L));
+		n = n.multiply(BigInteger.valueOf(1570882310L));
+		n = n.multiply(BigInteger.valueOf(9987231111L));
+		n = n.multiply(BigInteger.valueOf(1119502020L));
+		testFactorN(n);
+	}
+	
+	private static void test2(){
 		Map<BigInteger, Integer> factors = new HashMap<BigInteger, Integer>();
 		factors.put(BigInteger.valueOf(179426549L), 2);
 		factors.put(BigInteger.valueOf(179426231L), 1);
 		factors.put(BigInteger.valueOf(2237), 1);
 		factors.put(BigInteger.valueOf(3), 4);
 		testFactorProductOf(factors);
+	}
+	
+	private static void project1(long personalNumber){
+		int j = 0;
 		
-		
+		BigInteger firstNumber = BigInteger.valueOf(personalNumber).multiply(BigInteger.valueOf(10).pow(60 + j));
+		for(int i = 0; i < 200; i++){
+			BigInteger number = firstNumber.add(BigInteger.valueOf(i));
+			Map<BigInteger, Integer> factors = getPrimeFactors(number);
+			System.out.println(factors);
+			System.out.println(validateFactors(factors, number));
+		}
 	}
 	
 	private static boolean validateFactors(Map<BigInteger, Integer> factors, BigInteger product){
@@ -71,9 +87,9 @@ public class Main {
 		BigInteger smallerFactor;
 		
 		if(n.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) <= 0){
-			System.out.println("naiveGetFactor(" + n + ")");
+			Printer.MAIN.println("naiveGetFactor(" + n + ")");
 			smallerFactor = Naive.naiveGetFactor(n);
-			System.out.println("FOUND: " + smallerFactor);
+			Printer.MAIN.println("FOUND: " + smallerFactor);
 			return smallerFactor;
 		}
 //		return PollardRho.pollardRho(n);
@@ -83,18 +99,18 @@ public class Main {
 		
 		PollardRho.G g = new PollardRho.G(n, BigInteger.valueOf(2));
 		try {
-			System.out.println("pollardRhoInner(" + n + ")");
+			Printer.MAIN.println("pollardRhoInner(" + n + ")");
 			smallerFactor = PollardRho.pollardRhoInner(n, BigInteger.valueOf(2), x -> g.g(x));
 		} catch (FactorizationFailure e) {
-			System.out.println("pollardRho failed");
+			Printer.MAIN.println("pollardRho failed");
 			try {
-				System.out.println("QuadrSieve(" + n + ")");
+				Printer.MAIN.println("QuadrSieve(" + n + ")");
 				smallerFactor = QuadrSieve.getFactor(n);
 			} catch (FactorizationFailure e1) {
 				throw new FactorizationFailure("cant' factor " + n );
 			}
 		}
-		System.out.println("FOUND: " + smallerFactor);
+		Printer.MAIN.println("FOUND: " + smallerFactor);
 		return smallerFactor;
 	}
 
@@ -108,9 +124,9 @@ public class Main {
 	* For instance getPrimeFactors(12) == {2:2, 3:1} since 12 = 2^2 * 3^1
 	*/
 	public static Map<BigInteger, Integer> getPrimeFactors(BigInteger n){
-		System.out.println("\n-----------------------");
-		System.out.println("getPrimeFactors(" + n + ")");
-		System.out.println("-----------------------\n");
+		Printer.MAIN.println("\n-----------------------");
+		Printer.MAIN.println("getPrimeFactors(" + n + ")");
+		Printer.MAIN.println("-----------------------\n");
 		Map<BigInteger, Integer> primeFactors = new HashMap<BigInteger, Integer>();
 		BigInteger factor;
 		BigInteger smallerFactor;
@@ -119,12 +135,12 @@ public class Main {
 		while(! factors.isEmpty()){
 			factor = factors.remove(0);
 			try{
-				// System.out.println("getFactor(" + factor + ")");
+				// Printer.MAIN.println("getFactor(" + factor + ")");
 				smallerFactor = getFactor(factor);
 				factors.add(smallerFactor);
 				factors.add(factor.divide(smallerFactor));
 			}catch(FactorizationFailure e){
-				System.out.println("PRIME: " + factor);
+				Printer.MAIN.println("PRIME: " + factor);
 				increment(primeFactors, factor);
 			}
 		}
@@ -162,21 +178,16 @@ public class Main {
 		cols.get(3).computeAndSetFactors(primes);
 
 		Matrix m = new Matrix(cols);
-		System.out.println(m);
+		Printer.MAIN.println(m);
 		m.gaussEliminate();
-		System.out.println("\n" + m);
+		Printer.MAIN.println("\n" + m);
 		
 		List<ArrayList<Integer>> solutions = m.getSomeNonTrivialSolutions();
 		for(ArrayList<Integer> solution : solutions) {
-			System.out.println("Product of " + Arrays.toString(solution.stream().mapToInt(i -> cols.get(i).getNumber().intValue()).toArray()) + " is a square");
+			Printer.MAIN.println("Product of " + Arrays.toString(solution.stream().mapToInt(i -> cols.get(i).getNumber().intValue()).toArray()) + " is a square");
 		}
 	}
-	
-	
-	
-	
-	
-	
+
 	
 	
 	
