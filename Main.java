@@ -36,7 +36,7 @@ public class Main {
 	
 	private static void project1(){
 		for(BigInteger number : NGenerator.genNumbers()){
-			Map<BigInteger, Integer> factors = getPrimeFactors(number);
+			Map<BigInteger, Integer> factors = factorNumber(number);
 			System.out.println(factors);
 			System.out.println(validateFactors(factors, number));
 		}
@@ -53,8 +53,8 @@ public class Main {
 	}
 	
 	private static void testFactorN(BigInteger n){
-		Map<BigInteger,Integer> factors = getPrimeFactors(n);
-		System.out.println("factors: " + getPrimeFactors(n));
+		Map<BigInteger,Integer> factors = factorNumber(n);
+		System.out.println("factors: " + factorNumber(n));
 		System.out.println("CORRECT: " + validateFactors(factors, n));
 	}
 	
@@ -66,7 +66,7 @@ public class Main {
 			}
 		}
 //		List<BigInteger> resultFactors = factorNumber(n);
-		Map<BigInteger, Integer> resultFactors = getPrimeFactors(n);
+		Map<BigInteger, Integer> resultFactors = factorNumber(n);
 		System.out.println("factors: " + primeFactors);
 		System.out.println("result: " + resultFactors);
 		boolean correct =primeFactors.equals(resultFactors);
@@ -119,7 +119,7 @@ public class Main {
 	* Factors are returned in a map with factors as keys and the factor-powers as values.
 	* For instance getPrimeFactors(12) == {2:2, 3:1} since 12 = 2^2 * 3^1
 	*/
-	public static Map<BigInteger, Integer> getPrimeFactors(BigInteger n){
+	public static Map<BigInteger, Integer> factorNumber(BigInteger n){
 		Printer.MAIN.println("\n-----------------------");
 		Printer.MAIN.println("getPrimeFactors(" + n + ")");
 		Printer.MAIN.println("-----------------------\n");

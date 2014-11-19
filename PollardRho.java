@@ -44,9 +44,26 @@ public class PollardRho {
 			if(i % (100 * 1000) == 0){
 				Printer.POLLARD_RHO.print(".");
 			}
-			x = g.apply(x);
-			y = g.apply(g.apply(y));
-			d = Naive.gcd(x.subtract(y).abs(), n);
+			if(i == 110 * 1000){
+				throw new FactorizationFailure("Took too long to factorize " + n);
+			}
+			
+			x = x.pow(2).add(BigInteger.valueOf(2)).mod(n);
+			y = y.pow(2).add(BigInteger.valueOf(2)).mod(n).pow(2).add(BigInteger.valueOf(2)).mod(n);
+			
+			BigInteger t;
+			BigInteger a = x.subtract(y).abs();
+			BigInteger b = n;
+			while(!b.equals(BigInteger.ZERO)){
+				t = b;
+				b = a.mod(b);
+				a = t;
+			}
+			d = a;
+			
+//			x = g.apply(x);
+//			y = g.apply(g.apply(y));
+//			d = Naive.gcd(x.subtract(y).abs(), n);
 			// Printer.POLLARD.print(x + ", " + y + ", " + d);
 		}
 		Printer.POLLARD_RHO.println(".");
