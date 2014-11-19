@@ -11,9 +11,37 @@ public class Main {
 	public Main() {	
 	}
 
-	public static void main(String[] args) throws FactorizationFailure{
-		project1(1, 199);
-//		System.out.println(Naive.naiveGetFactor(BigInteger.valueOf(5030441351213302113L)));
+	public static void main(String[] args) throws FactorizationFailure {
+		if (args.length == 2)
+			project1_csvPrint(Integer.parseInt(args[0]),
+					Integer.parseInt(args[1]));
+		else
+			project1(1,199);
+	}
+
+	public static void project1_csvPrint(int from, int to) {
+		ArrayList<BigInteger> number = NGenerator.genNumbers();
+		for (int i = from; i <= to; i++) {
+			Map<BigInteger, Integer> factors = factorNumber(number.get(i));
+//			System.out.println(factors);
+			printFactor(factors,number.get(i));
+//			System.out.println(validateFactors(factors, number.get(i)));
+		}
+	}
+	
+	public static void printFactor(Map<BigInteger, Integer> factors, BigInteger number){
+				
+		ArrayList<BigInteger> values = new ArrayList<BigInteger>(factors.keySet());
+		
+		String csv = number.toString() + ";";
+		for (BigInteger bigInteger : values) {
+			csv += bigInteger.toString() + ";" + factors.get(bigInteger) + ";";
+		}
+		
+		csv = csv.substring(0, csv.length()-1);
+		
+		System.out.println(csv);
+		
 	}
 	
 	private static void test1(){

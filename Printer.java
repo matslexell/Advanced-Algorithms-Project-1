@@ -16,7 +16,7 @@ public enum Printer {
 	
 	private static final Map<String, Boolean> VERBOSE = new HashMap<String, Boolean>();
 	static{
-		VERBOSE.put("MAIN", true);
+		VERBOSE.put("MAIN", false);
 		VERBOSE.put("MATRIX", false);
 		VERBOSE.put("NAIVE", false);
 		VERBOSE.put("POLLARD_RHO", false);

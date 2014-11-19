@@ -12,7 +12,7 @@ WORKSPACE = '/Users/matslexell/Documents/Mats/IT/Programmering/workspace
 .java.class:
 	$(JC) $(JFLAGS) $*.java
 
-default: clean compile run
+default: clean compile
 
 clean:
 	$(RM) $(PACKAGE)*.class
@@ -22,3 +22,8 @@ compile:
 
 run:
 	$(RUN) $(MAIN_FILE) $(ARGS)
+
+test: clean compile 
+	$(RUN) $(MAIN_FILE) 100 102
+
+#java Main  
