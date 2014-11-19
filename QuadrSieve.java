@@ -10,7 +10,8 @@ import java.util.stream.Stream;
 
 public class QuadrSieve {
 
-	public static final long SMOOTHNESS = 25 * 1000 * 1000;
+	public static final long SMOOTHNESS = 7 * 1000;
+	public static final int NUM_P_VALUES = 150 * 1000;
 	public final static List<Long> primes = Naive.getPrimesLessThan(SMOOTHNESS + 1);
 
 	/**
@@ -178,7 +179,7 @@ public class QuadrSieve {
 	
 	public static BigInteger getFactor(BigInteger n) throws FactorizationFailure{
 		
-		TreeMap<BigInteger, BigInteger> pVals = QuadrSieve.genPVals(n,   500);
+		TreeMap<BigInteger, BigInteger> pVals = QuadrSieve.genPVals(n,   NUM_P_VALUES);
 		Printer.QUADR_SIEVE.println(pVals.size() + " p-values: ");// + pVals);
 		TreeMap<BigIntAndFactors, BigInteger> smoothPVals = smoothing(pVals);
 		Printer.QUADR_SIEVE.println(smoothPVals.size() + " smooth numbers: ");// + smoothPVals);
@@ -188,7 +189,7 @@ public class QuadrSieve {
 		Printer.QUADR_SIEVE.println("num solutions: " + solutions.size());
 		for(int solIndex = 0; solIndex < solutions.size(); solIndex++){
 			ArrayList<Integer> solution = solutions.get(solIndex);
-			Printer.QUADR_SIEVE.println("solution " + solIndex + ": " + solution);
+//			Printer.QUADR_SIEVE.println("solution " + solIndex + ": " + solution);
 			Stream<BigInteger> chosenNumbers = solution.stream().map(i -> columns.get(i).getNumber());
 			
 //			Printer.QUADR_SIEVE.println("Product of " + Arrays.toString(chosenNumbers.toArray()) + " is a square");

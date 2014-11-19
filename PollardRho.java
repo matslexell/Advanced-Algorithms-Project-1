@@ -26,6 +26,24 @@ public class PollardRho {
 		}
 		throw exception;
 	}
+	
+	public static BigInteger pollardRhoQuick(BigInteger n, BigInteger maxAdd, BigInteger maxStart) throws FactorizationFailure{
+		FactorizationFailure exception = null;
+		
+		for(BigInteger addInG = BigInteger.ONE; addInG.compareTo(maxAdd) <= 0; addInG = addInG.add(BigInteger.ONE)){
+			// Printer.POLLARD.print("add: " + addInG);
+			for(BigInteger startValue = BigInteger.valueOf(2); startValue.compareTo(maxStart) <= 0; startValue = startValue.add(BigInteger.ONE)){
+				try{
+					G g = new G(n, addInG);
+					BigInteger answer = pollardRhoInner(n, startValue, x -> g.g(x));
+					return answer;
+				}catch(FactorizationFailure e){ 
+					exception = e;
+				}
+			}
+		}
+		throw exception;
+	}
 
 	//Try to return a non-trivial factor of given number.
 	public static BigInteger pollardRhoInner(BigInteger n, BigInteger startValue, UnaryOperator<BigInteger> g) throws FactorizationFailure{
@@ -44,7 +62,8 @@ public class PollardRho {
 			if(i % (100 * 1000) == 0){
 				Printer.POLLARD_RHO.print(".");
 			}
-			if(i == 110 * 1000){
+			if(i == 500 * 1000){
+				Printer.POLLARD_RHO.println(".");
 				throw new FactorizationFailure("Took too long to factorize " + n);
 			}
 			
