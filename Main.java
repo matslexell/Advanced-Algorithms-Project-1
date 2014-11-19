@@ -24,18 +24,19 @@ public class Main {
 		for (int i = from; i <= to; i++) {
 			Map<BigInteger, Integer> factors = factorNumber(number.get(i));
 //			System.out.println(factors);
-			printFactor(factors,number.get(i));
+			printFactor(factors,number.get(i),i);
 //			System.out.println(validateFactors(factors, number.get(i)));
 		}
 	}
 	
-	public static void printFactor(Map<BigInteger, Integer> factors, BigInteger number){
+	public static void printFactor(Map<BigInteger, Integer> factors, BigInteger number,int i){
 				
 		ArrayList<BigInteger> values = new ArrayList<BigInteger>(factors.keySet());
 		
-		String csv = number.toString() + ";";
+//		String csv = number.toString() + ";";
+		String csv = i + " ";
 		for (BigInteger bigInteger : values) {
-			csv += bigInteger.toString() + ";" + factors.get(bigInteger) + ";";
+			csv += bigInteger.toString() + " " + factors.get(bigInteger) + " ";
 		}
 		
 		csv = csv.substring(0, csv.length()-1);
