@@ -12,7 +12,8 @@ public class Main {
 	}
 
 	public static void main(String[] args) throws FactorizationFailure{
-		project1();
+		project1(1, 199);
+//		System.out.println(Naive.naiveGetFactor(BigInteger.valueOf(5030441351213302113L)));
 	}
 	
 	private static void test1(){
@@ -34,11 +35,16 @@ public class Main {
 		testFactorProductOf(factors);
 	}
 	
-	private static void project1(){
-		for(BigInteger number : NGenerator.genNumbers()){
+	private static void project1(int first, int last){
+		ArrayList<BigInteger> numbers = NGenerator.genNumbers();
+		for(int i = first; i <= last; i++){
+			BigInteger number = numbers.get(i);
+			long startTime = System.currentTimeMillis();
 			Map<BigInteger, Integer> factors = factorNumber(number);
 			System.out.println(factors);
-			System.out.println(validateFactors(factors, number));
+			long passedTimeSec = (System.currentTimeMillis() - startTime)/1000;
+			System.out.println("Factoring took " + passedTimeSec + " s.");
+			System.out.println("[" + i + "] : " + validateFactors(factors, number));
 		}
 	}
 	
@@ -82,31 +88,31 @@ public class Main {
 	public static BigInteger getFactor(BigInteger n) throws FactorizationFailure{
 		BigInteger smallerFactor;
 		
-		if(n.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) <= 0){
-			Printer.MAIN.println("naiveGetFactor(" + n + ")");
+		if(n.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) <= 0){
+			Printer.MAIN.print("naiveGetFactor(" + n + ")");
 			smallerFactor = Naive.naiveGetFactor(n);
-			Printer.MAIN.println("FOUND: " + smallerFactor);
+			Printer.MAIN.println("  FOUND: " + smallerFactor);
 			return smallerFactor;
 		}
-//		return PollardRho.pollardRho(n);
+	
 		
 		
-		
-		
-		PollardRho.G g = new PollardRho.G(n, BigInteger.valueOf(2));
+//		PollardRho.G g = new PollardRho.G(n, BigInteger.valueOf(2));
 		try {
-			Printer.MAIN.println("pollardRhoInner(" + n + ")");
-			smallerFactor = PollardRho.pollardRhoInner(n, BigInteger.valueOf(2), x -> g.g(x));
+			Printer.MAIN.print("pollardRhoInner(" + n + ")");
+			final BigInteger maxAdd = BigInteger.valueOf(1);
+			final BigInteger maxStart = BigInteger.valueOf(2);
+			smallerFactor = PollardRho.pollardRhoQuick(n, maxAdd, maxStart);
 		} catch (FactorizationFailure e) {
-			Printer.MAIN.println("pollardRho failed");
+			Printer.MAIN.println(" FAILED");
 			try {
-				Printer.MAIN.println("QuadrSieve(" + n + ")");
+				Printer.MAIN.print("QuadrSieve(" + n + ")");
 				smallerFactor = QuadrSieve.getFactor(n);
 			} catch (FactorizationFailure e1) {
 				throw new FactorizationFailure("cant' factor " + n );
 			}
 		}
-		Printer.MAIN.println("FOUND: " + smallerFactor);
+		Printer.MAIN.println("  FOUND: " + smallerFactor);
 		return smallerFactor;
 	}
 
@@ -120,9 +126,8 @@ public class Main {
 	* For instance getPrimeFactors(12) == {2:2, 3:1} since 12 = 2^2 * 3^1
 	*/
 	public static Map<BigInteger, Integer> factorNumber(BigInteger n){
-		Printer.MAIN.println("\n-----------------------");
-		Printer.MAIN.println("getPrimeFactors(" + n + ")");
-		Printer.MAIN.println("-----------------------\n");
+		Printer.MAIN.println("\n------------------------------------------------------------------");
+		Printer.MAIN.println("getPrimeFactors(" + n + ")\n");
 		Map<BigInteger, Integer> primeFactors = new HashMap<BigInteger, Integer>();
 		BigInteger factor;
 		BigInteger smallerFactor;
@@ -136,7 +141,7 @@ public class Main {
 				factors.add(smallerFactor);
 				factors.add(factor.divide(smallerFactor));
 			}catch(FactorizationFailure e){
-				Printer.MAIN.println("PRIME: " + factor);
+				Printer.MAIN.println("   PRIME");
 				increment(primeFactors, factor);
 			}
 		}
